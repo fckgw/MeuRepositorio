@@ -33,7 +33,7 @@ define('FTP_UPLOAD_DIR', 'meurepositorio.bdsoft.com.br/DriverBDSoft');
 // --- CONFIGURAÇÕES GERAIS ---
 
 // Defina o espaço total do seu drive em Gigabytes (GB)
-define('TOTAL_SPACE_GB', 1);
+define('TOTAL_SPACE_GB', 100);
 
 
 // --- CONFIGURAÇÕES DO BANCO DE DADOS MYSQL ---
