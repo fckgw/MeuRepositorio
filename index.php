@@ -21,12 +21,12 @@ $percentage_used = ($total_space_bytes > 0) ? round(($used_space_bytes / $total_
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BDSoft Driver</title>
+    <title>Meu Drive</title>
     <link rel="stylesheet" href="<?php echo BASE_URL; ?>/style.css">
 </head>
 <body>
     <div class="container">
-        <header class="header"><strong>Armazenamento em Nuvem</strong></header>
+        <header class="header"><strong>Meu Drive na Nuvem</strong></header>
         <nav class="toolbar">
             <button id="upload-btn">Fazer Upload</button>
             <button id="new-folder-btn">Criar Pasta</button>
@@ -45,6 +45,7 @@ $percentage_used = ($total_space_bytes > 0) ? round(($used_space_bytes / $total_
             }
             ?>
         </div>
+
         <div class="storage-info">
             <div class="pie-chart" style="--p:<?php echo $percentage_used; ?>"> <?php echo $percentage_used; ?>% </div>
             <div class="storage-text">
@@ -52,6 +53,7 @@ $percentage_used = ($total_space_bytes > 0) ? round(($used_space_bytes / $total_
                 <span><?php echo $used_space_gb; ?> GB de <?php echo TOTAL_SPACE_GB; ?> GB usados</span>
             </div>
         </div>
+        
         <?php
         if (isset($_SESSION['upload_message'])) {
             $message = $_SESSION['upload_message']; $status = $_SESSION['upload_status'];
@@ -70,18 +72,26 @@ $percentage_used = ($total_space_bytes > 0) ? round(($used_space_bytes / $total_
                     $nome_arquivo = htmlspecialchars($arquivo['name']);
                     $data_hora = date('d/m/Y H:i:s', $arquivo['modify']);
                     $is_dir = $arquivo['type'] == 'dir';
-                    $is_image = !$is_dir && preg_match('/\.(jpg|jpeg|png|gif|webp|svg)$/i', $nome_arquivo);
-                    // --- NOVA VERIFICAÇÃO PARA VÍDEOS ---
+                    $is_image = !$is_dir && preg_match('/\.(jpg|jpeg|png|gif|webp)$/i', $nome_arquivo);
                     $is_video = !$is_dir && preg_match('/\.(mp4|webm|mov|ogg)$/i', $nome_arquivo);
+                    // --- NOVA VERIFICAÇÃO PARA WORD ---
+                    $is_word = !$is_dir && preg_match('/\.(doc|docx)$/i', $nome_arquivo);
 
                     $item_path = !empty($current_path) ? $current_path . '/' . $arquivo['name'] : $arquivo['name'];
                     $tag = $is_dir ? 'a' : 'div';
                     $href = $is_dir ? "href='" . BASE_URL . "/index.php?path=" . urlencode($item_path) . "'" : '';
                     
-                    // --- NOVO ATRIBUTO data-is-video ---
                     echo "<div class='file-item-wrapper' draggable='true' data-filename='$nome_arquivo'>";
-                    echo "  <$tag $href class='file-item' data-is-image='" . ($is_image ? '1' : '0') . "' data-is-video='" . ($is_video ? '1' : '0') . "' data-is-dir='" . ($is_dir ? '1' : '0') . "'>";
-                    echo "      <div class='file-icon'></div>";
+                    echo "  <$tag $href class='file-item' data-is-image='" . ($is_image ? '1' : '0') . "' data-is-video='" . ($is_video ? '1' : '0') . "' data-is-word='" . ($is_word ? '1' : '0') . "' data-is-dir='" . ($is_dir ? '1' : '0') . "'>";
+                    
+                    // --- LÓGICA DE THUMBNAIL ---
+                    if ($is_image) {
+                        $thumbnail_url = BASE_URL . '/' . PUBLIC_UPLOADS_PATH . '/' . ($current_path ? $current_path . '/' : '') . $nome_arquivo;
+                        echo "  <img src='" . htmlspecialchars($thumbnail_url) . "' class='file-thumbnail' alt='Thumbnail for $nome_arquivo' loading='lazy'>";
+                    } else {
+                        echo "  <div class='file-icon'></div>";
+                    }
+
                     echo "      <div class='file-info'><span class='file-name'>$nome_arquivo</span><span class='file-date'>$data_hora</span></div>";
                     echo "      <div class='file-actions'>";
                     if (!$is_dir) echo "      <a href='" . BASE_URL . "/download.php?path=" . urlencode($current_path) . "&file=$nome_arquivo' class='action-btn download' title='Baixar'>&#x21E9;</a>";
@@ -96,19 +106,13 @@ $percentage_used = ($total_space_bytes > 0) ? round(($used_space_bytes / $total_
         </main>
     </div>
 
-    <!-- --- MODAL DE PREVIEW GENÉRICO --- -->
-    <div id="preview-modal" class="modal">
-        <span class="close-modal">&times;</span>
-        <div id="modal-preview-content">
-            <!-- Conteúdo (imagem ou vídeo) será inserido aqui pelo JavaScript -->
-        </div>
-    </div>
-
+    <!-- Modais e Formulários Ocultos (sem alterações) -->
+    <div id="preview-modal" class="modal"><span class="close-modal">&times;</span><div id="modal-preview-content"></div></div>
     <div id="move-item-modal" class="modal"><div class="modal-content-form"><span class="close-modal">&times;</span><h3>Mover Item</h3><p>Selecione a pasta de destino para: <strong id="move-item-name"></strong></p><select id="folder-destination-select" size="10"></select><button id="confirm-move-btn">Mover Agora</button></div></div>
     <div id="upload-progress-modal" class="modal"><div class="modal-content-form"><h3>Enviando Arquivos...</h3><div id="upload-feedback"></div><div class="progress-bar-container"><div id="progress-bar"></div></div><p id="progress-text"></p></div></div>
     <form id="upload-form" action="<?php echo BASE_URL; ?>/upload.php" method="post" enctype="multipart/form-data" style="display: none;"><input type="file" name="arquivos[]" id="file-input" required multiple><input type="hidden" name="path" value="<?php echo htmlspecialchars($current_path); ?>"></form>
     <form id="new-folder-form" action="<?php echo BASE_URL; ?>/create_folder.php" method="post" style="display:none;"><input type="hidden" name="folder_name" id="folder_name_input"><input type="hidden" name="path" value="<?php echo htmlspecialchars($current_path); ?>"></form>
-    <form id="delete-item-form" action="<?php echo BASE_URL; ?>/delete-item.php" method="post" style="display:none;"><input type="hidden" name="item_name" id="item_name_input"><input type="hidden" name="path" value="<?php echo htmlspecialchars($current_path); ?>"></form>
+    <form id="delete-item-form" action="<?php echo BASE_URL; ?>/delete_item.php" method="post" style="display:none;"><input type="hidden" name="item_name" id="item_name_input"><input type="hidden" name="path" value="<?php echo htmlspecialchars($current_path); ?>"></form>
     
     <script>
         const publicBaseUrl = '<?php echo BASE_URL; ?>/';

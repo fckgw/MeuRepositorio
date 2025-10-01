@@ -1,9 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // --- VARIÁVEIS GLOBAIS E INICIAIS ---
     const fileItemWrappers = document.querySelectorAll('.file-item-wrapper');
     const currentPath = new URLSearchParams(window.location.search).get('path') || '';
 
-    // --- LÓGICA DE ÍCONES E PREVIEW (EXECUTADA PARA CADA ITEM) ---
     fileItemWrappers.forEach(wrapper => {
         const filename = wrapper.dataset.filename;
         const fileItem = wrapper.querySelector('.file-item');
@@ -13,23 +11,27 @@ document.addEventListener('DOMContentLoaded', () => {
         const isDir = fileItem.dataset.isDir === '1';
         const isImage = fileItem.dataset.isImage === '1';
         const isVideo = fileItem.dataset.isVideo === '1';
+        const isWord = fileItem.dataset.isWord === '1';
 
-        let iconClass = 'icon-default';
-        if (isDir) { iconClass = 'icon-folder'; }
-        else if (isImage) { iconClass = 'icon-image'; }
-        else if (isVideo) { iconClass = 'icon-video'; }
-        else if (/\.(mp3|wav|ogg|flac)$/i.test(filename)) { iconClass = 'icon-audio'; }
-        else if (/\.(zip|rar|7z|tar\.gz)$/i.test(filename)) { iconClass = 'icon-archive'; }
-        iconElement.classList.add(iconClass);
+        if (iconElement) {
+            let iconClass = 'icon-default';
+            if (isDir) { iconClass = 'icon-folder'; }
+            else if (isVideo) { iconClass = 'icon-video'; }
+            else if (isWord) { iconClass = 'icon-word'; }
+            else if (/\.(mp3|wav|ogg|flac)$/i.test(filename)) { iconClass = 'icon-audio'; }
+            else if (/\.(zip|rar|7z|tar\.gz)$/i.test(filename)) { iconClass = 'icon-archive'; }
+            iconElement.classList.add(iconClass);
+        }
 
         if (isImage || isVideo) {
-            fileItem.addEventListener('click', () => {
+            fileItem.addEventListener('click', (e) => {
+                // Impede o clique se o alvo for um botão de ação
+                if(e.target.closest('.action-btn')) return;
+
                 const modal = document.getElementById('preview-modal');
                 const contentContainer = document.getElementById('modal-preview-content');
                 contentContainer.innerHTML = '';
-
-                const fullUrl = publicBaseUrl + publicBasePath + (currentPath ? currentPath + '/' : '') + filename;
-
+                const fullUrl = publicBaseUrl + publicBasePath + (currentPath ? current_path + '/' : '') + filename;
                 if (isImage) {
                     const img = document.createElement('img');
                     img.src = fullUrl;
@@ -46,7 +48,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // --- FUNCIONALIDADE DE UPLOAD COM BARRA DE PROGRESSO E VALIDAÇÃO ---
     const uploadBtn = document.getElementById('upload-btn');
     const fileInput = document.getElementById('file-input');
     const uploadForm = document.getElementById('upload-form');
@@ -76,13 +77,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const progressText = document.getElementById('progress-text');
         const uploadFeedback = document.getElementById('upload-feedback');
         xhr.open('POST', form.action, true);
-        xhr.upload.addEventListener('progress', e => {
-            if (e.lengthComputable) {
-                const percentComplete = Math.round((e.loaded / e.total) * 100);
-                progressBar.style.width = percentComplete + '%';
-                progressText.textContent = `${percentComplete}% concluído`;
-            }
-        });
+        xhr.upload.addEventListener('progress', e => { if (e.lengthComputable) { const percentComplete = Math.round((e.loaded / e.total) * 100); progressBar.style.width = percentComplete + '%'; progressText.textContent = `${percentComplete}% concluído`; } });
         xhr.onload = () => { location.reload(); };
         xhr.onerror = () => { alert("Ocorreu um erro de rede durante o upload."); uploadModal.style.display = 'none'; };
         uploadModal.style.display = 'block';
@@ -92,15 +87,16 @@ document.addEventListener('DOMContentLoaded', () => {
         xhr.send(formData);
     }
     
-    // --- OUTRAS FUNCIONALIDADES (CRIAR PASTA, DELETAR, MOVER, DRAG/DROP) ---
     const newFolderBtn = document.getElementById('new-folder-btn');
     const newFolderForm = document.getElementById('new-folder-form');
     const folderNameInput = document.getElementById('folder_name_input');
     if (newFolderBtn) { newFolderBtn.addEventListener('click', () => { const folderName = prompt('Digite o nome da nova pasta:'); if (folderName && folderName.trim() !== '') { folderNameInput.value = folderName; newFolderForm.submit(); } }); }
+    
     const deleteBtns = document.querySelectorAll('.delete');
     const deleteItemForm = document.getElementById('delete-item-form');
     const itemNameInput = document.getElementById('item_name_input');
     deleteBtns.forEach(btn => { btn.addEventListener('click', e => { e.stopPropagation(); e.preventDefault(); const itemName = btn.dataset.name; if (confirm(`Tem certeza que deseja remover "${itemName}"? Esta ação não pode ser desfeita.`)) { itemNameInput.value = itemName; deleteItemForm.submit(); } }); });
+    
     const moveModal = document.getElementById('move-item-modal');
     const confirmMoveBtn = document.getElementById('confirm-move-btn');
     let itemToMove = null;
@@ -126,11 +122,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const allModals = document.querySelectorAll('.modal');
     allModals.forEach(modal => {
         const closeModalBtn = modal.querySelector('.close-modal');
-        const closeAndStopMedia = () => {
-            const video = modal.querySelector('video');
-            if (video) { video.pause(); video.src = ''; }
-            modal.style.display = 'none';
-        };
+        const closeAndStopMedia = () => { const video = modal.querySelector('video'); if (video) { video.pause(); video.src = ''; } modal.style.display = 'none'; };
         if (closeModalBtn) closeModalBtn.addEventListener('click', closeAndStopMedia);
         modal.addEventListener('click', e => { if (e.target === modal) closeAndStopMedia(); });
     });
