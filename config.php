@@ -44,5 +44,5 @@ define('FTP_PARENT_DIR', '/meurepositorio.bdsoft.com.br/DriverBDSoft');
 
 define('APP_NAME', 'BDSoft Driver');
 define('TRIAL_DAYS', 7);
-define('TOTAL_SPACE_GB', 1); // Limite de espaço por utilizador
+define('TOTAL_SPACE_GB', 100); // Limite de espaço por utilizador
 ?>

@@ -3,22 +3,11 @@ require_once 'session_check.php';
 require_once 'config.php';
 require_once 'ftp_functions.php';
 date_default_timezone_set('America/Sao_Paulo');
-
-// Define os caminhos dinâmicos com base no ID do utilizador
 $user_root_ftp_path = FTP_PARENT_DIR . '/user_' . $user['id'];
 $user_root_public_path = PUBLIC_PARENT_PATH . '/user_' . $user['id'];
-
-// --- LÓGICA DE NAVEGAÇÃO CORRIGIDA ---
-// Pega o caminho relativo da URL (ex: 'Pessoal' ou 'Pessoal/Videos').
 $current_path = $_GET['path'] ?? '';
-// Segurança: remove '..' e barras extras
 $current_path = str_replace('..', '', trim($current_path, '/'));
-
-// Constrói o caminho FTP completo a ser usado pelas funções.
-// Se $current_path estiver vazio, usa a raiz do utilizador.
-// Se não, anexa o caminho relativo à raiz do utilizador.
 $full_path = !empty($current_path) ? $user_root_ftp_path . '/' . $current_path : $user_root_ftp_path;
-
 $lista_de_arquivos = listarArquivosFTP($full_path);
 $used_space_bytes = get_used_space($user_root_ftp_path);
 $total_space_bytes = TOTAL_SPACE_GB * 1024 * 1024 * 1024;
@@ -53,14 +42,13 @@ $percentage_used = ($total_space_bytes > 0) ? round(($used_space_bytes / $total_
         <div class="breadcrumbs">
             <a href="<?php echo BASE_URL; ?>">Raiz</a>
             <?php
-            // --- LÓGICA DOS BREADCRUMBS CORRIGIDA ---
             if (!empty($current_path)) {
                 $path_parts = explode('/', $current_path);
                 $built_path = '';
-                foreach ($path_parts as $index => $part) {
-                    // Constrói o caminho até à parte atual
-                    $built_path = implode('/', array_slice($path_parts, 0, $index + 1));
+                foreach ($path_parts as $part) {
+                    $built_path .= $part;
                     echo "<span> / </span><a href='" . BASE_URL . "/index.php?path=" . urlencode($built_path) . "'>" . htmlspecialchars($part) . "</a>";
+                    $built_path .= '/';
                 }
             }
             ?>
@@ -94,16 +82,11 @@ $percentage_used = ($total_space_bytes > 0) ? round(($used_space_bytes / $total_
                     $is_video = !$is_dir && preg_match('/\.(mp4|webm|mov|ogg)$/i', $nome_arquivo);
                     $is_word = !$is_dir && preg_match('/\.(doc|docx)$/i', $nome_arquivo);
                     $is_pdf = !$is_dir && preg_match('/\.pdf$/i', $nome_arquivo);
-                    
-                    // --- LÓGICA DE CAMINHO PARA ITENS CORRIGIDA ---
                     $item_path = !empty($current_path) ? $current_path . '/' . $arquivo['name'] : $arquivo['name'];
-                    
                     $tag = $is_dir ? 'a' : 'div';
                     $href = $is_dir ? "href='" . BASE_URL . "/index.php?path=" . urlencode($item_path) . "'" : '';
-                    
                     echo "<div class='file-item-wrapper' draggable='true' data-filename='$nome_arquivo'>";
                     echo "  <$tag $href class='file-item' data-is-image='" . ($is_image ? '1' : '0') . "' data-is-video='" . ($is_video ? '1' : '0') . "' data-is-word='" . ($is_word ? '1' : '0') . "' data-is-pdf='" . ($is_pdf ? '1' : '0') . "' data-is-dir='" . ($is_dir ? '1' : '0') . "'>";
-                    
                     $file_url = BASE_URL . '/' . $user_root_public_path . '/' . ($current_path ? $current_path . '/' : '') . $nome_arquivo;
                     if ($is_image) {
                         echo "  <div class='thumbnail-container'><img src='" . htmlspecialchars($file_url) . "' class='file-thumbnail' alt='Thumbnail' loading='lazy'></div>";
@@ -112,7 +95,6 @@ $percentage_used = ($total_space_bytes > 0) ? round(($used_space_bytes / $total_
                     } else {
                         echo "  <div class='file-icon'></div>";
                     }
-
                     echo "      <div class='file-info'><span class='file-name'>$nome_arquivo</span><span class='file-date'>$data_hora</span></div>";
                     echo "      <div class='file-actions'>";
                     if (!$is_dir) echo "      <a href='" . BASE_URL . "/download.php?path=" . urlencode($current_path) . "&file=$nome_arquivo' class='action-btn download' title='Baixar'>&#x21E9;</a>";
@@ -126,9 +108,12 @@ $percentage_used = ($total_space_bytes > 0) ? round(($used_space_bytes / $total_
             ?>
         </main>
     </div>
-
-    <!-- Modais e Formulários Ocultos -->
-    <!-- ... (o resto do seu HTML aqui não precisa de alterações) ... -->
+    <div id="preview-modal" class="modal"><span class="close-modal">&times;</span><div id="modal-preview-content"></div></div>
+    <div id="move-item-modal" class="modal"><div class="modal-content-form"><span class="close-modal">&times;</span><h3>Mover Item</h3><p>Selecione a pasta de destino para: <strong id="move-item-name"></strong></p><select id="folder-destination-select" size="10"></select><button id="confirm-move-btn">Mover Agora</button></div></div>
+    <div id="upload-progress-modal" class="modal"><div class="modal-content-form"><h3>Enviando Arquivos...</h3><div id="upload-feedback"></div><div class="progress-bar-container"><div id="progress-bar"></div></div><p id="progress-text"></p></div></div>
+    <form id="upload-form" action="<?php echo BASE_URL; ?>/upload.php" method="post" enctype="multipart/form-data" style="display: none;"><input type="file" name="arquivos[]" id="file-input" required multiple><input type="hidden" name="path" value="<?php echo htmlspecialchars($current_path); ?>"></form>
+    <form id="new-folder-form" action="<?php echo BASE_URL; ?>/create_folder.php" method="post" style="display:none;"><input type="hidden" name="folder_name" id="folder_name_input"><input type="hidden" name="path" value="<?php echo htmlspecialchars($current_path); ?>"></form>
+    <form id="delete-item-form" action="<?php echo BASE_URL; ?>/delete_item.php" method="post" style="display:none;"><input type="hidden" name="item_name" id="item_name_input"><input type="hidden" name="path" value="<?php echo htmlspecialchars($current_path); ?>"></form>
     <script>
         const publicBaseUrl = '<?php echo BASE_URL; ?>/';
         const publicBasePath = '<?php echo $user_root_public_path; ?>/';

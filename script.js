@@ -1,9 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // --- VARIÁVEIS GLOBAIS E INICIAIS ---
     const fileItemWrappers = document.querySelectorAll('.file-item-wrapper');
     const currentPath = new URLSearchParams(window.location.search).get('path') || '';
 
-    // --- LÓGICA DE ÍCONES E PREVIEW (EXECUTADA PARA CADA ITEM) ---
     fileItemWrappers.forEach(wrapper => {
         const filename = wrapper.dataset.filename;
         const fileItem = wrapper.querySelector('.file-item');
@@ -15,7 +13,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const isWord = fileItem.dataset.isWord === '1';
         const isPdf = fileItem.dataset.isPdf === '1';
 
-        // --- LÓGICA DE ÍCONES (IGNORA SE HOUVER THUMBNAIL) ---
         const iconElement = fileItem.querySelector('.file-icon');
         if (iconElement) {
             let iconClass = 'icon-default';
@@ -28,17 +25,13 @@ document.addEventListener('DOMContentLoaded', () => {
             iconElement.classList.add(iconClass);
         }
 
-        // Adiciona evento de clique para abrir o preview
         if (isImage || isVideo) {
             fileItem.addEventListener('click', (e) => {
-                if (e.target.closest('.action-btn')) return;
+                if(e.target.closest('.action-btn')) return;
                 const modal = document.getElementById('preview-modal');
                 const contentContainer = document.getElementById('modal-preview-content');
                 contentContainer.innerHTML = '';
-
-                // --- ERRO CORRIGIDO AQUI (current_path -> currentPath) ---
                 const fullUrl = publicBaseUrl + publicBasePath + (currentPath ? currentPath + '/' : '') + filename;
-                
                 if (isImage) {
                     const img = document.createElement('img');
                     img.src = fullUrl;
@@ -55,7 +48,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // --- FUNCIONALIDADE DE UPLOAD COM BARRA DE PROGRESSO E VALIDAÇÃO ---
     const uploadBtn = document.getElementById('upload-btn');
     const fileInput = document.getElementById('file-input');
     const uploadForm = document.getElementById('upload-form');
@@ -95,15 +87,16 @@ document.addEventListener('DOMContentLoaded', () => {
         xhr.send(formData);
     }
     
-    // --- OUTRAS FUNCIONALIDADES (CRIAR PASTA, DELETAR, MOVER, DRAG/DROP) ---
     const newFolderBtn = document.getElementById('new-folder-btn');
     const newFolderForm = document.getElementById('new-folder-form');
     const folderNameInput = document.getElementById('folder_name_input');
     if (newFolderBtn) { newFolderBtn.addEventListener('click', () => { const folderName = prompt('Digite o nome da nova pasta:'); if (folderName && folderName.trim() !== '') { folderNameInput.value = folderName; newFolderForm.submit(); } }); }
+    
     const deleteBtns = document.querySelectorAll('.delete');
     const deleteItemForm = document.getElementById('delete-item-form');
     const itemNameInput = document.getElementById('item_name_input');
     deleteBtns.forEach(btn => { btn.addEventListener('click', e => { e.stopPropagation(); e.preventDefault(); const itemName = btn.dataset.name; if (confirm(`Tem certeza que deseja remover "${itemName}"? Esta ação não pode ser desfeita.`)) { itemNameInput.value = itemName; deleteItemForm.submit(); } }); });
+    
     const moveModal = document.getElementById('move-item-modal');
     const confirmMoveBtn = document.getElementById('confirm-move-btn');
     let itemToMove = null;
