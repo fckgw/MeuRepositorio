@@ -1,11 +1,21 @@
 <?php
-session_start();
+// 1. Inicia a sessão e verifica se o utilizador está autenticado
+require_once 'session_check.php';
+
+// 2. Inclui os ficheiros de configuração e funções
 require_once 'config.php';
 require_once 'ftp_functions.php';
 
+// 3. Define o caminho de redirecionamento
 $current_path = $_POST['path'] ?? '';
 $current_path = str_replace('..', '', trim($current_path, '/'));
-$base_path = !empty($current_path) ? FTP_UPLOAD_DIR . '/' . $current_path : FTP_UPLOAD_DIR;
+$redirect_url = BASE_URL . (!empty($current_path) ? '/index.php?path=' . urlencode($current_path) : '');
+
+// 4. Define o diretório raiz do utilizador atual
+$user_root_ftp_path = FTP_PARENT_DIR . '/user_' . $user['id'];
+
+// 5. Define o caminho base onde o item a ser apagado se encontra
+$base_path = !empty($current_path) ? $user_root_ftp_path . '/' . $current_path : $user_root_ftp_path;
 
 if (isset($_POST['item_name']) && !empty($_POST['item_name'])) {
     $item_name = basename($_POST['item_name']);
@@ -23,7 +33,7 @@ if (isset($_POST['item_name']) && !empty($_POST['item_name'])) {
         }
         ftp_close($conn_id);
     } else {
-        $_SESSION['upload_message'] = "ERRO: Falha na conexão FTP.";
+        $_SESSION['upload_message'] = "ERRO: Falha na ligação FTP.";
         $_SESSION['upload_status'] = 'error';
     }
 } else {
@@ -31,7 +41,7 @@ if (isset($_POST['item_name']) && !empty($_POST['item_name'])) {
     $_SESSION['upload_status'] = 'error';
 }
 
-$redirect_url = BASE_URL . (!empty($current_path) ? '/index.php?path=' . urlencode($current_path) : '');
+// 6. Redireciona para a página correta
 header('Location: ' . $redirect_url);
 exit();
 ?>

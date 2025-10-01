@@ -1,16 +1,26 @@
 <?php
-session_start();
+require_once 'session_check.php';
 require_once 'config.php';
 require_once 'ftp_functions.php';
 date_default_timezone_set('America/Sao_Paulo');
 
+// Define os caminhos dinâmicos com base no ID do utilizador
+$user_root_ftp_path = FTP_PARENT_DIR . '/user_' . $user['id'];
+$user_root_public_path = PUBLIC_PARENT_PATH . '/user_' . $user['id'];
+
+// --- LÓGICA DE NAVEGAÇÃO CORRIGIDA ---
+// Pega o caminho relativo da URL (ex: 'Pessoal' ou 'Pessoal/Videos').
 $current_path = $_GET['path'] ?? '';
+// Segurança: remove '..' e barras extras
 $current_path = str_replace('..', '', trim($current_path, '/'));
-$full_path = !empty($current_path) ? FTP_UPLOAD_DIR . '/' . $current_path : FTP_UPLOAD_DIR;
+
+// Constrói o caminho FTP completo a ser usado pelas funções.
+// Se $current_path estiver vazio, usa a raiz do utilizador.
+// Se não, anexa o caminho relativo à raiz do utilizador.
+$full_path = !empty($current_path) ? $user_root_ftp_path . '/' . $current_path : $user_root_ftp_path;
 
 $lista_de_arquivos = listarArquivosFTP($full_path);
-
-$used_space_bytes = get_used_space(); 
+$used_space_bytes = get_used_space($user_root_ftp_path);
 $total_space_bytes = TOTAL_SPACE_GB * 1024 * 1024 * 1024;
 $free_space_bytes = $total_space_bytes - $used_space_bytes;
 $used_space_gb = round($used_space_bytes / (1024 * 1024 * 1024), 2);
@@ -21,12 +31,21 @@ $percentage_used = ($total_space_bytes > 0) ? round(($used_space_bytes / $total_
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Meu Drive</title>
+    <title><?php echo !empty($current_path) ? basename($current_path) . ' - ' : ''; ?><?php echo APP_NAME; ?></title>
     <link rel="stylesheet" href="<?php echo BASE_URL; ?>/style.css">
 </head>
 <body>
     <div class="container">
-        <header class="header"><strong>Meu Drive na Nuvem</strong></header>
+        <header class="header">
+            <strong><?php echo APP_NAME; ?></strong>
+            <div class="user-menu">
+                <span>Olá, <?php echo htmlspecialchars($user['username']); ?>!</span>
+                <?php if ($user['role'] == 'admin'): ?>
+                    <a href="admin.php">Painel Admin</a>
+                <?php endif; ?>
+                <a href="logout.php">Sair</a>
+            </div>
+        </header>
         <nav class="toolbar">
             <button id="upload-btn">Fazer Upload</button>
             <button id="new-folder-btn">Criar Pasta</button>
@@ -34,18 +53,18 @@ $percentage_used = ($total_space_bytes > 0) ? round(($used_space_bytes / $total_
         <div class="breadcrumbs">
             <a href="<?php echo BASE_URL; ?>">Raiz</a>
             <?php
+            // --- LÓGICA DOS BREADCRUMBS CORRIGIDA ---
             if (!empty($current_path)) {
                 $path_parts = explode('/', $current_path);
                 $built_path = '';
-                foreach ($path_parts as $part) {
-                    $built_path .= $part;
+                foreach ($path_parts as $index => $part) {
+                    // Constrói o caminho até à parte atual
+                    $built_path = implode('/', array_slice($path_parts, 0, $index + 1));
                     echo "<span> / </span><a href='" . BASE_URL . "/index.php?path=" . urlencode($built_path) . "'>" . htmlspecialchars($part) . "</a>";
-                    $built_path .= '/';
                 }
             }
             ?>
         </div>
-
         <div class="storage-info">
             <div class="pie-chart" style="--p:<?php echo $percentage_used; ?>"> <?php echo $percentage_used; ?>% </div>
             <div class="storage-text">
@@ -53,7 +72,6 @@ $percentage_used = ($total_space_bytes > 0) ? round(($used_space_bytes / $total_
                 <span><?php echo $used_space_gb; ?> GB de <?php echo TOTAL_SPACE_GB; ?> GB usados</span>
             </div>
         </div>
-        
         <?php
         if (isset($_SESSION['upload_message'])) {
             $message = $_SESSION['upload_message']; $status = $_SESSION['upload_status'];
@@ -74,20 +92,23 @@ $percentage_used = ($total_space_bytes > 0) ? round(($used_space_bytes / $total_
                     $is_dir = $arquivo['type'] == 'dir';
                     $is_image = !$is_dir && preg_match('/\.(jpg|jpeg|png|gif|webp)$/i', $nome_arquivo);
                     $is_video = !$is_dir && preg_match('/\.(mp4|webm|mov|ogg)$/i', $nome_arquivo);
-                    // --- NOVA VERIFICAÇÃO PARA WORD ---
                     $is_word = !$is_dir && preg_match('/\.(doc|docx)$/i', $nome_arquivo);
-
+                    $is_pdf = !$is_dir && preg_match('/\.pdf$/i', $nome_arquivo);
+                    
+                    // --- LÓGICA DE CAMINHO PARA ITENS CORRIGIDA ---
                     $item_path = !empty($current_path) ? $current_path . '/' . $arquivo['name'] : $arquivo['name'];
+                    
                     $tag = $is_dir ? 'a' : 'div';
                     $href = $is_dir ? "href='" . BASE_URL . "/index.php?path=" . urlencode($item_path) . "'" : '';
                     
                     echo "<div class='file-item-wrapper' draggable='true' data-filename='$nome_arquivo'>";
-                    echo "  <$tag $href class='file-item' data-is-image='" . ($is_image ? '1' : '0') . "' data-is-video='" . ($is_video ? '1' : '0') . "' data-is-word='" . ($is_word ? '1' : '0') . "' data-is-dir='" . ($is_dir ? '1' : '0') . "'>";
+                    echo "  <$tag $href class='file-item' data-is-image='" . ($is_image ? '1' : '0') . "' data-is-video='" . ($is_video ? '1' : '0') . "' data-is-word='" . ($is_word ? '1' : '0') . "' data-is-pdf='" . ($is_pdf ? '1' : '0') . "' data-is-dir='" . ($is_dir ? '1' : '0') . "'>";
                     
-                    // --- LÓGICA DE THUMBNAIL ---
+                    $file_url = BASE_URL . '/' . $user_root_public_path . '/' . ($current_path ? $current_path . '/' : '') . $nome_arquivo;
                     if ($is_image) {
-                        $thumbnail_url = BASE_URL . '/' . PUBLIC_UPLOADS_PATH . '/' . ($current_path ? $current_path . '/' : '') . $nome_arquivo;
-                        echo "  <img src='" . htmlspecialchars($thumbnail_url) . "' class='file-thumbnail' alt='Thumbnail for $nome_arquivo' loading='lazy'>";
+                        echo "  <div class='thumbnail-container'><img src='" . htmlspecialchars($file_url) . "' class='file-thumbnail' alt='Thumbnail' loading='lazy'></div>";
+                    } elseif ($is_video) {
+                        echo "  <div class='thumbnail-container'><video class='file-thumbnail' preload='metadata'><source src='" . htmlspecialchars($file_url) . "#t=0.5' type='video/mp4'></video></div>";
                     } else {
                         echo "  <div class='file-icon'></div>";
                     }
@@ -106,17 +127,11 @@ $percentage_used = ($total_space_bytes > 0) ? round(($used_space_bytes / $total_
         </main>
     </div>
 
-    <!-- Modais e Formulários Ocultos (sem alterações) -->
-    <div id="preview-modal" class="modal"><span class="close-modal">&times;</span><div id="modal-preview-content"></div></div>
-    <div id="move-item-modal" class="modal"><div class="modal-content-form"><span class="close-modal">&times;</span><h3>Mover Item</h3><p>Selecione a pasta de destino para: <strong id="move-item-name"></strong></p><select id="folder-destination-select" size="10"></select><button id="confirm-move-btn">Mover Agora</button></div></div>
-    <div id="upload-progress-modal" class="modal"><div class="modal-content-form"><h3>Enviando Arquivos...</h3><div id="upload-feedback"></div><div class="progress-bar-container"><div id="progress-bar"></div></div><p id="progress-text"></p></div></div>
-    <form id="upload-form" action="<?php echo BASE_URL; ?>/upload.php" method="post" enctype="multipart/form-data" style="display: none;"><input type="file" name="arquivos[]" id="file-input" required multiple><input type="hidden" name="path" value="<?php echo htmlspecialchars($current_path); ?>"></form>
-    <form id="new-folder-form" action="<?php echo BASE_URL; ?>/create_folder.php" method="post" style="display:none;"><input type="hidden" name="folder_name" id="folder_name_input"><input type="hidden" name="path" value="<?php echo htmlspecialchars($current_path); ?>"></form>
-    <form id="delete-item-form" action="<?php echo BASE_URL; ?>/delete_item.php" method="post" style="display:none;"><input type="hidden" name="item_name" id="item_name_input"><input type="hidden" name="path" value="<?php echo htmlspecialchars($current_path); ?>"></form>
-    
+    <!-- Modais e Formulários Ocultos -->
+    <!-- ... (o resto do seu HTML aqui não precisa de alterações) ... -->
     <script>
         const publicBaseUrl = '<?php echo BASE_URL; ?>/';
-        const publicBasePath = '<?php echo PUBLIC_UPLOADS_PATH; ?>/';
+        const publicBasePath = '<?php echo $user_root_public_path; ?>/';
         const availableSpace = <?php echo max(0, $free_space_bytes); ?>;
     </script>
     <script src="<?php echo BASE_URL; ?>/script.js"></script>
