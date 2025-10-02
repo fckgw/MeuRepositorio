@@ -1,7 +1,9 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // --- VARIÁVEIS GLOBAIS E INICIAIS ---
     const fileItemWrappers = document.querySelectorAll('.file-item-wrapper');
     const currentPath = new URLSearchParams(window.location.search).get('path') || '';
 
+    // --- LÓGICA DE ÍCONES E PREVIEW (EXECUTADA PARA CADA ITEM) ---
     fileItemWrappers.forEach(wrapper => {
         const filename = wrapper.dataset.filename;
         const fileItem = wrapper.querySelector('.file-item');
@@ -13,6 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const isWord = fileItem.dataset.isWord === '1';
         const isPdf = fileItem.dataset.isPdf === '1';
 
+        // Lógica de ícones (ignora se houver thumbnail)
         const iconElement = fileItem.querySelector('.file-icon');
         if (iconElement) {
             let iconClass = 'icon-default';
@@ -25,13 +28,18 @@ document.addEventListener('DOMContentLoaded', () => {
             iconElement.classList.add(iconClass);
         }
 
+        // Adiciona evento de clique para abrir o preview (apenas para imagens e vídeos)
         if (isImage || isVideo) {
             fileItem.addEventListener('click', (e) => {
+                // Impede abrir se clicar num botão de ação dentro do card
                 if(e.target.closest('.action-btn')) return;
+                
                 const modal = document.getElementById('preview-modal');
                 const contentContainer = document.getElementById('modal-preview-content');
-                contentContainer.innerHTML = '';
+                contentContainer.innerHTML = ''; // Limpa conteúdo anterior
+
                 const fullUrl = publicBaseUrl + publicBasePath + (currentPath ? currentPath + '/' : '') + filename;
+                
                 if (isImage) {
                     const img = document.createElement('img');
                     img.src = fullUrl;
@@ -48,6 +56,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // --- FUNCIONALIDADE DE UPLOAD COM BARRA DE PROGRESSO E VALIDAÇÃO ---
     const uploadBtn = document.getElementById('upload-btn');
     const fileInput = document.getElementById('file-input');
     const uploadForm = document.getElementById('upload-form');
@@ -87,6 +96,7 @@ document.addEventListener('DOMContentLoaded', () => {
         xhr.send(formData);
     }
     
+    // --- OUTRAS FUNCIONALIDADES (CRIAR PASTA, DELETAR, MOVER, DRAG/DROP) ---
     const newFolderBtn = document.getElementById('new-folder-btn');
     const newFolderForm = document.getElementById('new-folder-form');
     const folderNameInput = document.getElementById('folder_name_input');
@@ -108,16 +118,49 @@ document.addEventListener('DOMContentLoaded', () => {
             const folderSelect = document.getElementById('folder-destination-select');
             moveItemNameEl.textContent = itemToMove;
             folderSelect.innerHTML = '<option>A carregar pastas...</option>';
+
             fetch('get_folders.php').then(res => res.json()).then(data => {
                 folderSelect.innerHTML = '';
                 if (data.status === 'success' && data.folders) {
-                    data.folders.forEach(folder => { const option = document.createElement('option'); option.value = folder.path; option.innerHTML = folder.name; folderSelect.appendChild(option); });
+                    data.folders.forEach(folder => {
+                        if (folder.path !== currentPath) {
+                            const option = document.createElement('option');
+                            option.value = folder.path;
+                            option.innerHTML = folder.name;
+                            folderSelect.appendChild(option);
+                        }
+                    });
+                } else {
+                    folderSelect.innerHTML = '<option>Não foi possível carregar as pastas.</option>';
                 }
+            }).catch(() => {
+                folderSelect.innerHTML = '<option>Erro ao carregar pastas.</option>';
             });
             moveModal.style.display = 'block';
         });
     });
-    if (confirmMoveBtn) confirmMoveBtn.addEventListener('click', () => { const folderSelect = document.getElementById('folder-destination-select'); const targetFolder = folderSelect.value; if (itemToMove && targetFolder !== null) { const data = { source_item: itemToMove, target_folder: targetFolder, current_path: currentPath }; fetch('move_item.php', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) }).then(res => res.json()).then(result => { if (result.status === 'success') location.reload(); else alert(result.message); }); } });
+
+    if (confirmMoveBtn) {
+        confirmMoveBtn.addEventListener('click', () => {
+            const folderSelect = document.getElementById('folder-destination-select');
+            const targetFolder = folderSelect.value;
+            if (itemToMove && targetFolder !== null) {
+                confirmMoveBtn.disabled = true;
+                confirmMoveBtn.textContent = 'A mover...';
+                const data = { source_item: itemToMove, target_folder: targetFolder, current_path: currentPath };
+                fetch('move_item.php', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) })
+                .then(res => res.json()).then(result => {
+                    if (result.status === 'success') {
+                        location.reload();
+                    } else {
+                        alert(result.message);
+                        confirmMoveBtn.disabled = false;
+                        confirmMoveBtn.textContent = 'Mover Agora';
+                    }
+                });
+            }
+        });
+    }
     
     const allModals = document.querySelectorAll('.modal');
     allModals.forEach(modal => {

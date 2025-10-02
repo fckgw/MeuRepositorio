@@ -3,7 +3,6 @@ require_once 'session_check.php';
 if ($user['role'] !== 'admin') { die("Acesso negado."); }
 require_once 'db.php';
 
-// Busca todos os utilizadores e todos os planos
 $users_result = $conn->query("SELECT u.id, u.username, u.email, u.role, u.trial_ends_at, u.created_at, u.plan_id, u.status, p.plan_name FROM users u LEFT JOIN storage_plans p ON u.plan_id = p.id ORDER BY u.created_at DESC");
 $plans_result = $conn->query("SELECT id, plan_name, space_gb FROM storage_plans ORDER BY id");
 $plans = $plans_result->fetch_all(MYSQLI_ASSOC);
@@ -32,14 +31,14 @@ $plans = $plans_result->fetch_all(MYSQLI_ASSOC);
                 unset($_SESSION['admin_message']); unset($_SESSION['admin_status']);
             }
             ?>
-            <table>
+            <table class="admin-table">
                 <thead>
                     <tr>
                         <th>Utilizador</th>
-                        <th>Plano Atual</th>
-                        <th>Estado da Conta</th>
+                        <th>Plano</th>
+                        <th>Estado</th>
                         <th>Trial</th>
-                        <th>Ações</th>
+                        <th style="text-align: center;">Ações</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -59,7 +58,7 @@ $plans = $plans_result->fetch_all(MYSQLI_ASSOC);
                                         </option>
                                     <?php endforeach; ?>
                                 </select>
-                                <button type="submit">Atualizar Plano</button>
+                                <button type="submit" class="btn btn-update">✓</button>
                             </form>
                         </td>
                         <td>
@@ -69,13 +68,13 @@ $plans = $plans_result->fetch_all(MYSQLI_ASSOC);
                                     <option value="active" <?php if ($row['status'] == 'active') echo 'selected'; ?>>Ativo</option>
                                     <option value="blocked" <?php if ($row['status'] == 'blocked') echo 'selected'; ?>>Bloqueado</option>
                                 </select>
-                                <button type="submit">Mudar Estado</button>
+                                <button type="submit" class="btn btn-status">✓</button>
                             </form>
                         </td>
                         <td>
                             <?php if ($row['role'] !== 'admin'): ?>
                                 <?php if (strtotime($row['trial_ends_at']) > time()): ?>
-                                    <span class="status-active">Ativo até <?php echo date('d/m/Y', strtotime($row['trial_ends_at'])); ?></span>
+                                    <span class="status-active">Ativo</span> até <?php echo date('d/m/Y', strtotime($row['trial_ends_at'])); ?>
                                 <?php else: ?>
                                     <span class="status-expired">Expirado</span>
                                 <?php endif; ?>
@@ -86,7 +85,7 @@ $plans = $plans_result->fetch_all(MYSQLI_ASSOC);
                         <td class="actions-cell">
                              <form action="resend_welcome_email.php" method="POST" class="admin-form">
                                 <input type="hidden" name="user_id" value="<?php echo $row['id']; ?>">
-                                <button type="submit" class="resend-btn" title="Reenviar email de boas-vindas">Reenviar Email</button>
+                                <button type="submit" class="btn btn-resend" title="Reenviar email de boas-vindas">✉️</button>
                              </form>
                         </td>
                     </tr>
