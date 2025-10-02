@@ -42,6 +42,10 @@ if ($conn_id && ftp_login($conn_id, FTP_USER, FTP_PASS)) {
         }
     }
     ftp_close($conn_id);
+
+    require_once 'utils.php'; // Inclui as utilidades
+    log_activity('UPLOAD_FILES', "Ficheiros com sucesso: " . count($success_files) . ", Ficheiros com falha: " . count($failed_files) . " na pasta: " . $base_path);
+
 } else {
     $_SESSION['upload_message'] = "ERRO Crítico: Falha na ligação FTP.";
     $_SESSION['upload_status'] = 'error';

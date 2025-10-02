@@ -1,9 +1,14 @@
 <?php
+// O session_start() é necessário para definir as variáveis de sessão APÓS o login bem-sucedido.
 session_start();
+
+// Se o utilizador já estiver autenticado, redireciona-o para a página de seleção de módulos.
 if (isset($_SESSION['user_id'])) {
-    header('Location: index.php');
+    header('Location: select_module.php');
     exit();
 }
+
+// Inclui apenas os ficheiros necessários para o login.
 require_once 'config.php';
 require_once 'db.php';
 
@@ -13,6 +18,8 @@ $registration_success = isset($_GET['status']) && $_GET['status'] == 'registered
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $email = $_POST['email'];
     $password = $_POST['password'];
+    
+    // Prepara a consulta para evitar injeção de SQL.
     $stmt = $conn->prepare("SELECT id, password, role FROM users WHERE email = ?");
     $stmt->bind_param("s", $email);
     $stmt->execute();
@@ -21,12 +28,33 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if ($stmt->num_rows > 0) {
         $stmt->bind_result($id, $hashed_password, $role);
         $stmt->fetch();
+        
+        // Verifica se a palavra-passe corresponde.
         if (password_verify($password, $hashed_password)) {
+            // Sucesso! Define as variáveis de sessão.
             $_SESSION['user_id'] = $id;
             $_SESSION['role'] = $role;
-            header('Location: index.php');
+
+            // --- NOVO: ATUALIZA A DATA DO ÚLTIMO LOGIN ---
+            $stmt_update = $conn->prepare("UPDATE users SET last_login_at = NOW() WHERE id = ?");
+            $stmt_update->bind_param("i", $id);
+            $stmt_update->execute();
+            $stmt_update->close();
+            // --- FIM DA ATUALIZAÇÃO ---
+
+             require_once 'utils.php';
+             log_activity('LOGIN_SUCCESS', "Utilizador: {$email}");
+
+            // Lógica de redirecionamento (já deve estar assim)
+            if ($role == 'admin') {
+                header('Location: dashboard.php');
+            } else {
+                header('Location: select_module.php');
+            }
             exit();
-        } else {
+        } 
+        
+        else {
             $error = 'Palavra-passe incorreta.';
         }
     } else {
@@ -62,6 +90,8 @@ $conn->close();
         </form>
         <p>Não tem uma conta? <a href="register.php">Registe-se aqui</a>.</p>
     </div>
+
+    <!-- SCRIPT PARA CONTROLAR O "OLHO" DA PALAVRA-PASSE -->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const togglePassword = document.querySelector('#toggle-password');

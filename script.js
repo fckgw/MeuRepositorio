@@ -167,3 +167,21 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 });
+
+
+// --- LÓGICA DO MENU LATERAL RETRÁTIL ---
+const sidebar = document.querySelector('.sidebar');
+const toggleButton = document.getElementById('sidebar-toggle');
+if (sidebar && toggleButton) {
+    toggleButton.addEventListener('click', () => {
+        sidebar.classList.toggle('collapsed');
+        // Salva o estado no navegador do utilizador
+        localStorage.setItem('sidebarState', sidebar.classList.contains('collapsed') ? 'collapsed' : 'expanded');
+    });
+
+    // Verifica se há um estado guardado
+    const savedState = localStorage.getItem('sidebarState');
+    if (savedState === 'collapsed') {
+        sidebar.classList.add('collapsed');
+    }
+}

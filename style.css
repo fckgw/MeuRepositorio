@@ -1,20 +1,64 @@
 /* --- Reset Básico e Fontes --- */
 body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; margin: 0; background-color: #f8f9fa; color: #3c4043; }
+
+/* --- Estruturas Principais --- */
 .container { display: flex; flex-direction: column; min-height: 100vh; }
+.main-wrapper { display: flex; }
+.page-content { flex-grow: 1; width: calc(100% - 250px); }
+
+/* --- Menu Lateral (Sidebar) --- */
+.sidebar {
+    width: 250px;
+    background-color: #fff;
+    border-right: 1px solid #dadce0;
+    display: flex;
+    flex-direction: column; /* Essencial para o flex-grow funcionar */
+    height: 100vh;
+    position: sticky;
+    top: 0;
+    transition: width 0.3s ease;
+}
+.sidebar-header { padding: 1rem; border-bottom: 1px solid #dadce0; position: relative; }
+.sidebar-logo { height: 40px; width: auto; display: block; margin: 0 auto; transition: opacity 0.3s ease; }
+.sidebar-nav {
+    flex-grow: 1; /* CORREÇÃO: Faz esta área ocupar todo o espaço disponível */
+    padding: 1rem 0;
+    overflow-y: auto; /* Adiciona scroll se houver muitos módulos */
+}
+.sidebar-nav ul { list-style: none; padding: 0; margin: 0; }
+.sidebar-nav .nav-link { display: flex; align-items: center; gap: 1rem; padding: 0.75rem 1.5rem; color: #3c4043; text-decoration: none; font-weight: 500; border-left: 3px solid transparent; white-space: nowrap; }
+.sidebar-nav .nav-link svg { width: 20px; height: 20px; color: #5f6368; flex-shrink: 0; }
+.sidebar-nav .nav-link:hover { background-color: #f1f3f4; }
+.sidebar-nav .nav-link.active { background-color: #e8f0fe; color: #1967d2; border-left-color: #1967d2; }
+.sidebar-nav .nav-link.active svg { color: #1967d2; }
+.sidebar-footer {
+    border-top: 1px solid #dadce0;
+    flex-shrink: 0; /* CORREÇÃO: Impede que o rodapé encolha */
+    overflow: hidden;
+}
+
+/* --- ESTILOS PARA O MENU RETRÁTIL --- */
+#sidebar-toggle { position: absolute; top: 15px; right: -15px; background-color: #fff; border: 1px solid #dadce0; border-radius: 50%; width: 30px; height: 30px; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 10; transition: transform 0.3s ease; }
+.sidebar.collapsed { width: 80px; }
+.sidebar.collapsed .sidebar-logo, .sidebar.collapsed .nav-link span, .sidebar.collapsed .storage-text, .sidebar.collapsed .user-info { opacity: 0; visibility: hidden; transition: opacity 0.1s, visibility 0.1s; }
+.sidebar.collapsed .nav-link { justify-content: center; }
+.sidebar.collapsed #sidebar-toggle { transform: rotate(180deg); }
+.sidebar-footer .user-info { padding: 1rem 1.5rem; font-size: 0.8em; border-bottom: 1px solid #dadce0; }
+.user-info .info-label { color: #5f6368; }
+.user-info .info-value { font-weight: 500; }
+
 /* --- Cabeçalho e Barra de Ferramentas --- */
-.header { display: flex; justify-content: space-between; align-items: center; background-color: #fff; padding: 1rem 1.5rem; border-bottom: 1px solid #dadce0; font-size: 1.2rem; }
+.header { display: flex; justify-content: space-between; align-items: center; background-color: #fff; padding: 1rem 1.5rem; border-bottom: 1px solid #dadce0; }
 .user-menu { font-size: 0.9rem; display: flex; gap: 1rem; align-items: center; }
 .user-menu a { color: #1a73e8; text-decoration: none; font-weight: bold; }
 .header-logo { height: 35px; width: auto; }
 .toolbar { background-color: #f1f3f4; padding: 1rem 1.5rem; display: flex; align-items: center; gap: 1rem; }
 .toolbar button { background-color: #1a73e8; color: white; border: none; border-radius: 4px; padding: 10px 15px; font-weight: bold; cursor: pointer; transition: background-color 0.2s; }
 .toolbar button:hover { background-color: #185abc; }
-/* --- Breadcrumbs de Navegação --- */
 .breadcrumbs { padding: 0.75rem 1.5rem; background-color: #fff; border-bottom: 1px solid #dadce0; font-size: 0.9rem; }
 .breadcrumbs a { color: #1a73e8; text-decoration: none; font-weight: 500; }
 .breadcrumbs a:hover { text-decoration: underline; }
 .breadcrumbs span { color: #5f6368; margin: 0 0.5rem; }
-/* --- Gráfico de Pizza de Armazenamento --- */
 .storage-info { padding: 1rem 1.5rem; background-color: #f1f3f4; border-bottom: 1px solid #dadce0; display: flex; align-items: center; gap: 1rem; }
 @property --p { syntax: '<integer>'; initial-value: 0; inherits: false; }
 .pie-chart { --p: 0; --b: 12px; --c: #1a73e8; --w: 60px; width: var(--w); aspect-ratio: 1; position: relative; display: inline-grid; place-content: center; font-size: 1.1em; font-weight: bold; color: var(--c); animation: pie-anim 1s 1 forwards; }
@@ -22,37 +66,31 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
 @keyframes pie-anim { from { --p: 0; } }
 .storage-text { display: flex; flex-direction: column; }
 .storage-text span { font-size: 0.9em; color: #5f6368; }
-/* --- Mensagens de Alerta --- */
 .alert { padding: 15px; margin: 1rem 1.5rem; border-radius: 8px; color: white; font-weight: bold; text-align: center; }
 .alert.success { background-color: #34a853; }
 .alert.error { background-color: #ea4335; }
 .alert.warning { background-color: #f4b400; color: #333; }
-/* --- O GRID DE ARQUIVOS --- */
 .file-explorer { flex-grow: 1; padding: 1.5rem; display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1.5rem; align-content: flex-start; }
-/* --- O "CARD" DE CADA ARQUIVO --- */
 .file-item { background-color: #fff; border: 1px solid #dadce0; border-radius: 8px; padding: 1rem; display: flex; flex-direction: column; align-items: center; text-align: center; transition: background-color 0.2s, border-color 0.2s; position: relative; color: inherit; text-decoration: none; width: 100%; height: 100%; box-sizing: border-box; }
 .file-item:hover { background-color: #e8f0fe; border-color: #1a73e8; }
 .file-item[href] { cursor: pointer; }
 .file-info { margin-top: 1rem; display: flex; flex-direction: column; gap: 0.25rem; width: 100%; }
 .file-name { font-weight: 500; font-size: 0.9rem; word-break: break-all; }
 .file-date { font-size: 0.75rem; color: #5f6368; }
-/* --- ÍCONES E THUMBNAILS --- */
-.file-icon { width: 80px; height: 80px; background-size: contain; background-repeat: no-repeat; background-position: center; flex-shrink: 0; }
-.thumbnail-container { width: 120px; height: 80px; display: flex; align-items: center; justify-content: center; overflow: hidden; border-radius: 4px; background-color: #f1f3f4; flex-shrink: 0; }
-.file-thumbnail { width: 100%; height: 100%; object-fit: cover; }
-.icon-default { background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%235f6368"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zM6 20V4h7v5h5v11H6z"/></svg>'); }
-.icon-audio { background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23f4b400"><path d="M12 3v9.28c-.47-.17-.97-.28-1.5-.28C8.01 12 6 14.01 6 16.5S8.01 21 10.5 21c2.31 0 4.2-1.75 4.45-4H15V6h4V3h-7z"/></svg>'); }
-.icon-video { background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%234285f4"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/></svg>'); }
-.icon-archive { background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%2334a853"><path d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-5 3h-2v2h2v2h-2v2h-2v-2H9v-2h2V9h2v2z"/></svg>'); }
-.icon-folder { background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%235f6368"><path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/></svg>'); }
-.icon-word { background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%232b579a"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zM13 18H9v-2h4v2zm3-4H9v-2h7v2zm-2.5-4H9V8h4.5v2z"/></svg>'); }
-.icon-pdf { background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23db4437"><path d="M20 2H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM9.5 11.5c0 .83-.67 1.5-1.5 1.5H7v2H5.5v-5H8c.83 0 1.5.67 1.5 1.5v.5zm-2.5.5h1v-1h-1v1zm4.5 2H10v-5h1.5v1.5h1V10h-1V8.5h1.5v5zm4.5-2.5c0 .83-.67 1.5-1.5 1.5s-1.5-.67-1.5-1.5v-1c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5v1z"/></svg>'); }
-/* --- Ações do Arquivo --- */
 .file-actions { position: absolute; top: 5px; right: 5px; z-index: 2; }
 .action-btn { background-color: rgba(60, 64, 67, 0.7); color: white; border: none; border-radius: 50%; width: 28px; height: 28px; cursor: pointer; font-size: 16px; line-height: 28px; text-align: center; text-decoration: none; opacity: 0.8; transition: opacity 0.2s; }
 .action-btn:hover { opacity: 1; }
 .action-btn.move { font-size: 20px; }
-/* --- Modais --- */
+.file-icon { width: 80px; height: 80px; background-size: contain; background-repeat: no-repeat; background-position: center; flex-shrink: 0; }
+.thumbnail-container { width: 120px; height: 80px; display: flex; align-items: center; justify-content: center; overflow: hidden; border-radius: 4px; background-color: #f1f3f4; flex-shrink: 0; }
+.file-thumbnail { width: 100%; height: 100%; object-fit: cover; }
+.icon-default { background-image: url('data:image/svg+xml,...'); }
+.icon-audio { background-image: url('data:image/svg+xml,...'); }
+.icon-video { background-image: url('data:image/svg+xml,...'); }
+.icon-archive { background-image: url('data:image/svg+xml,...'); }
+.icon-folder { background-image: url('data:image/svg+xml,...'); }
+.icon-word { background-image: url('data:image/svg+xml,...'); }
+.icon-pdf { background-image: url('data:image/svg+xml,...'); }
 .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.85); }
 #modal-preview-content { margin: auto; display: block; max-width: 90%; max-height: 90%; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
 #modal-preview-content > * { max-width: 100%; max-height: 100%; display: block; }
@@ -61,15 +99,12 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
 .modal-content-form .close-modal { color: #333; }
 #folder-destination-select { width: 100%; margin: 10px 0; padding: 5px; border: 1px solid #ccc; border-radius: 4px; font-family: monospace; }
 #confirm-move-btn { background-color: #34a853; color: white; padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer; }
-/* --- Barra de Progresso --- */
 .progress-bar-container { width: 100%; background-color: #e0e0e0; border-radius: 4px; margin: 15px 0; }
 #progress-bar { width: 0%; height: 20px; background-color: #1a73e8; border-radius: 4px; text-align: center; line-height: 20px; color: white; transition: width 0.2s ease-in-out; }
 #progress-text { text-align: center; font-weight: bold; }
-/* --- Drag and Drop --- */
 .file-item-wrapper { cursor: grab; }
 .file-item-wrapper.dragging .file-item { opacity: 0.5; border: 2px dashed #ccc; }
 .file-item[data-is-dir="1"].drag-over { border: 2px solid #1a73e8; background-color: #e8f0fe; }
-/* --- Páginas de Autenticação e Admin --- */
 .auth-page { display: flex; justify-content: center; align-items: center; min-height: 100vh; background-color: #f1f3f4; }
 .auth-container { width: 100%; max-width: 400px; padding: 2rem; background: #fff; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); text-align: center; box-sizing: border-box; margin: 1rem; }
 .auth-logo { max-width: 250px; height: auto; margin-bottom: 1.5rem; }
@@ -85,25 +120,48 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
 .password-wrapper input { padding-right: 40px; }
 .toggle-password-icon { position: absolute; right: 10px; cursor: pointer; color: #757575; display: flex; align-items: center; justify-content: center; }
 .toggle-password-icon svg { width: 20px; height: 20px; }
-.admin-panel { padding: 1.5rem; overflow-x: auto; }
-.admin-table { width: 100%; border-collapse: collapse; background: #fff; font-size: 0.9em; }
-.admin-table th, .admin-table td { padding: 12px 15px; border: 1px solid #ddd; text-align: left; vertical-align: middle; }
-.admin-table th { background-color: #f1f3f4; }
-.admin-table tr:nth-of-type(even) { background-color: #f8f9fa; }
+.admin-panel { padding: 1.5rem; }
+.dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
+.chart-container { background: #fff; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); position: relative; height: 350px; }
+.table-wrapper { overflow-x: auto; background: #fff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+.admin-table { width: 100%; border-collapse: collapse; font-size: 0.9em; }
+.admin-table th, .admin-table td { padding: 12px 15px; border-bottom: 1px solid #ddd; text-align: left; vertical-align: middle; }
+.admin-table th { background-color: #f8f9fa; font-weight: 600; }
+.admin-table tr:last-of-type td { border-bottom: none; }
 .admin-form { display: flex; align-items: center; gap: 10px; }
 .admin-form select { padding: 8px; border-radius: 4px; border: 1px solid #ccc; background-color: #fff; }
-.admin-form .btn { padding: 8px 12px; font-size: 0.9em; cursor: pointer; border: none; border-radius: 4px; color: white; font-weight: bold; }
-.admin-form .btn-update { background-color: #1a73e8; }
-.admin-form .btn-status { background-color: #f4b400; }
-.actions-cell { text-align: center !important; }
-.actions-cell .btn { display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; padding: 0; font-size: 1.2em; }
-.actions-cell .btn-resend { background-color: #34a853; }
-.status-active { color: #34a853; font-weight: bold; }
-.status-expired { color: #ea4335; font-weight: bold; }
-.status-blocked { background-color: #ea4335; color: white; padding: 3px 8px; border-radius: 12px; font-size: 0.8em; }
-.status-ok { background-color: #34a853; color: white; padding: 3px 8px; border-radius: 12px; font-size: 0.8em; }
-/* --- MELHORIAS PARA DISPOSITIVOS MÓVEIS --- */
+.admin-table .btn { display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; padding: 0; font-size: 0.9em; cursor: pointer; border: none; border-radius: 50%; color: white; transition: transform 0.2s; }
+.admin-table .btn:hover { transform: scale(1.1); }
+.admin-table .btn-update { background-color: #1a73e8; }
+.admin-table .btn-status { background-color: #f4b400; }
+.admin-table .btn-resend { background-color: #34a853; }
+.admin-table .btn-manage-modules { background-color: #5f6368; }
+.modules-checkbox-list { max-height: 250px; overflow-y: auto; border: 1px solid #ccc; border-radius: 4px; padding: 10px; margin: 1rem 0; }
+.modules-checkbox-list label { display: block; padding: 8px; cursor: pointer; }
+.modules-checkbox-list label:hover { background-color: #f1f3f4; }
+.status-active, .status-expired { font-weight: bold; }
+.status-active { color: #34a853; }
+.status-expired { color: #ea4335; }
+.status-blocked, .status-ok { padding: 4px 10px; border-radius: 12px; font-size: 0.8em; font-weight: bold; color: white; }
+.status-ok { background-color: #34a853; }
+.status-blocked { background-color: #ea4335; }
+.modules-cell { line-height: 1.6; }
+.module-tags { display: flex; flex-wrap: wrap; gap: 5px; }
+.module-tag { background-color: #e8f0fe; color: #1967d2; padding: 3px 8px; border-radius: 12px; font-size: 0.8em; font-weight: 500; }
+.no-modules { color: #999; font-style: italic; }
+.btn-submit { background-color: #34a853; color: white; padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; width: 100%; }
+.module-selector-page .header { position: sticky; top: 0; z-index: 10; }
+.module-selector-container { text-align: center; padding: 2rem; }
+.module-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1.5rem; max-width: 900px; margin: 2rem auto 0; }
+.module-card { background-color: #fff; border-radius: 8px; padding: 2rem 1rem; text-decoration: none; color: #3c4043; box-shadow: 0 2px 8px rgba(0,0,0,0.08); transition: transform 0.2s, box-shadow 0.2s; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.module-card:hover { transform: translateY(-5px); box-shadow: 0 4px 15px rgba(0,0,0,0.12); }
+.module-icon { width: 60px; height: 60px; margin-bottom: 1rem; color: #1a73e8; }
+.module-icon svg { width: 100%; height: 100%; }
+.module-name { font-weight: 600; font-size: 1.1rem; }
 @media (max-width: 768px) {
+    .main-wrapper { flex-direction: column; }
+    .sidebar { position: static; width: 100%; height: auto; border-right: none; border-bottom: 1px solid #dadce0; }
+    .page-content { width: 100%; }
     .file-explorer { padding: 1rem; gap: 1rem; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
     .file-item { padding: 0.75rem; }
     .file-item .file-actions { display: flex; opacity: 1; background-color: transparent; position: relative; top: auto; right: auto; margin-top: 10px; justify-content: center; }
@@ -114,4 +172,68 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
 @media (min-width: 769px) {
     .file-item .file-actions { display: none; }
     .file-item:hover .file-actions { display: flex; }
+}
+
+/* --- NOVOS ESTILOS PARA GESTÃO DE MÓDULOS --- */
+.module-management-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+.module-manage-card {
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 1rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+.module-manage-info {
+    display: flex;
+    flex-direction: column;
+}
+.module-manage-info code {
+    background-color: #f1f3f4;
+    padding: 2px 5px;
+    border-radius: 4px;
+    font-size: 0.8em;
+}
+
+
+/* Adicione ao final do seu style.css */
+.admin-table .btn-edit { background-color: #5f6368; }
+.admin-table .btn-delete { background-color: #ea4335; }
+.admin-form-stacked label {
+    font-weight: bold;
+    margin-bottom: -10px;
+    font-size: 0.9em;
+    color: #3c4043;
+}
+
+
+
+/* --- REPAGINAÇÃO FINAL DO ADMIN --- */
+.admin-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+.admin-header h2 {
+    margin: 0;
+}
+.admin-form-stacked .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    text-align: left;
+}
+.admin-table .btn-view {
+    background-color: #34a853; /* Verde */
+}
+.admin-table .actions-cell {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
 }
