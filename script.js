@@ -31,15 +31,11 @@ document.addEventListener('DOMContentLoaded', () => {
         // Adiciona evento de clique para abrir o preview (apenas para imagens e vídeos)
         if (isImage || isVideo) {
             fileItem.addEventListener('click', (e) => {
-                // Impede abrir se clicar num botão de ação dentro do card
                 if(e.target.closest('.action-btn')) return;
-                
                 const modal = document.getElementById('preview-modal');
                 const contentContainer = document.getElementById('modal-preview-content');
-                contentContainer.innerHTML = ''; // Limpa conteúdo anterior
-
+                contentContainer.innerHTML = '';
                 const fullUrl = publicBaseUrl + publicBasePath + (currentPath ? currentPath + '/' : '') + filename;
-                
                 if (isImage) {
                     const img = document.createElement('img');
                     img.src = fullUrl;
@@ -56,7 +52,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // --- FUNCIONALIDADE DE UPLOAD COM BARRA DE PROGRESSO E VALIDAÇÃO ---
+    // --- FUNCIONALIDADE DE UPLOAD (SEM ALTERAÇÕES) ---
     const uploadBtn = document.getElementById('upload-btn');
     const fileInput = document.getElementById('file-input');
     const uploadForm = document.getElementById('upload-form');
@@ -101,12 +97,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const newFolderForm = document.getElementById('new-folder-form');
     const folderNameInput = document.getElementById('folder_name_input');
     if (newFolderBtn) { newFolderBtn.addEventListener('click', () => { const folderName = prompt('Digite o nome da nova pasta:'); if (folderName && folderName.trim() !== '') { folderNameInput.value = folderName; newFolderForm.submit(); } }); }
-    
     const deleteBtns = document.querySelectorAll('.delete');
     const deleteItemForm = document.getElementById('delete-item-form');
     const itemNameInput = document.getElementById('item_name_input');
     deleteBtns.forEach(btn => { btn.addEventListener('click', e => { e.stopPropagation(); e.preventDefault(); const itemName = btn.dataset.name; if (confirm(`Tem certeza que deseja remover "${itemName}"? Esta ação não pode ser desfeita.`)) { itemNameInput.value = itemName; deleteItemForm.submit(); } }); });
-    
     const moveModal = document.getElementById('move-item-modal');
     const confirmMoveBtn = document.getElementById('confirm-move-btn');
     let itemToMove = null;
@@ -118,28 +112,15 @@ document.addEventListener('DOMContentLoaded', () => {
             const folderSelect = document.getElementById('folder-destination-select');
             moveItemNameEl.textContent = itemToMove;
             folderSelect.innerHTML = '<option>A carregar pastas...</option>';
-
             fetch('get_folders.php').then(res => res.json()).then(data => {
                 folderSelect.innerHTML = '';
                 if (data.status === 'success' && data.folders) {
-                    data.folders.forEach(folder => {
-                        if (folder.path !== currentPath) {
-                            const option = document.createElement('option');
-                            option.value = folder.path;
-                            option.innerHTML = folder.name;
-                            folderSelect.appendChild(option);
-                        }
-                    });
-                } else {
-                    folderSelect.innerHTML = '<option>Não foi possível carregar as pastas.</option>';
-                }
-            }).catch(() => {
-                folderSelect.innerHTML = '<option>Erro ao carregar pastas.</option>';
-            });
+                    data.folders.forEach(folder => { if (folder.path !== currentPath) { const option = document.createElement('option'); option.value = folder.path; option.innerHTML = folder.name; folderSelect.appendChild(option); } });
+                } else { folderSelect.innerHTML = '<option>Não foi possível carregar as pastas.</option>'; }
+            }).catch(() => { folderSelect.innerHTML = '<option>Erro ao carregar pastas.</option>'; });
             moveModal.style.display = 'block';
         });
     });
-
     if (confirmMoveBtn) {
         confirmMoveBtn.addEventListener('click', () => {
             const folderSelect = document.getElementById('folder-destination-select');
@@ -150,18 +131,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 const data = { source_item: itemToMove, target_folder: targetFolder, current_path: currentPath };
                 fetch('move_item.php', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) })
                 .then(res => res.json()).then(result => {
-                    if (result.status === 'success') {
-                        location.reload();
-                    } else {
-                        alert(result.message);
-                        confirmMoveBtn.disabled = false;
-                        confirmMoveBtn.textContent = 'Mover Agora';
-                    }
+                    if (result.status === 'success') { location.reload(); }
+                    else { alert(result.message); confirmMoveBtn.disabled = false; confirmMoveBtn.textContent = 'Mover Agora'; }
                 });
             }
         });
     }
-    
     const allModals = document.querySelectorAll('.modal');
     allModals.forEach(modal => {
         const closeModalBtn = modal.querySelector('.close-modal');

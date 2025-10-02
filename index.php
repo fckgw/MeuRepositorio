@@ -10,7 +10,7 @@ $current_path = str_replace('..', '', trim($current_path, '/'));
 $full_path = !empty($current_path) ? $user_root_ftp_path . '/' . $current_path : $user_root_ftp_path;
 $lista_de_arquivos = listarArquivosFTP($full_path);
 $used_space_bytes = get_used_space($user_root_ftp_path);
-$total_space_gb = $user['space_gb'] ?? TOTAL_SPACE_GB; // Usa o plano do user, ou um fallback
+$total_space_gb = $user['space_gb'] ?? TOTAL_SPACE_GB;
 $total_space_bytes = $total_space_gb * 1024 * 1024 * 1024;
 $free_space_bytes = $total_space_bytes - $used_space_bytes;
 $used_space_gb = round($used_space_bytes / (1024 * 1024 * 1024), 2);
@@ -20,6 +20,8 @@ $percentage_used = !$is_unlimited && $total_space_bytes > 0 ? round(($used_space
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo !empty($current_path) ? basename($current_path) . ' - ' : ''; ?><?php echo APP_NAME; ?></title>
     <link rel="stylesheet" href="<?php echo BASE_URL; ?>/style.css">
 </head>
@@ -85,9 +87,13 @@ $percentage_used = !$is_unlimited && $total_space_bytes > 0 ? round(($used_space
                     echo "<div class='file-item-wrapper' draggable='true' data-filename='$nome_arquivo'>";
                     echo "  <$tag $href class='file-item' data-is-image='" . ($is_image ? '1' : '0') . "' data-is-video='" . ($is_video ? '1' : '0') . "' data-is-word='" . ($is_word ? '1' : '0') . "' data-is-pdf='" . ($is_pdf ? '1' : '0') . "' data-is-dir='" . ($is_dir ? '1' : '0') . "'>";
                     $file_url = BASE_URL . '/' . $user_root_public_path . '/' . ($current_path ? $current_path . '/' : '') . $nome_arquivo;
-                    if ($is_image) { echo "  <div class='thumbnail-container'><img src='" . htmlspecialchars($file_url) . "' class='file-thumbnail' alt='Thumbnail' loading='lazy'></div>"; }
-                    elseif ($is_video) { echo "  <div class='thumbnail-container'><video class='file-thumbnail' preload='metadata'><source src='" . htmlspecialchars($file_url) . "#t=0.5' type='video/mp4'></video></div>"; }
-                    else { echo "  <div class='file-icon'></div>"; }
+                    if ($is_image) {
+                        echo "  <div class='thumbnail-container'><img src='" . htmlspecialchars($file_url) . "' class='file-thumbnail' alt='Thumbnail' loading='lazy'></div>";
+                    } elseif ($is_video) {
+                        echo "  <div class='thumbnail-container'><video class='file-thumbnail' preload='metadata'><source src='" . htmlspecialchars($file_url) . "#t=0.5' type='video/mp4'></video></div>";
+                    } else {
+                        echo "  <div class='file-icon'></div>";
+                    }
                     echo "      <div class='file-info'><span class='file-name'>$nome_arquivo</span><span class='file-date'>$data_hora</span></div>";
                     echo "      <div class='file-actions'>";
                     if (!$is_dir) echo "      <a href='" . BASE_URL . "/download.php?path=" . urlencode($current_path) . "&file=$nome_arquivo' class='action-btn download' title='Baixar'>&#x21E9;</a>";
