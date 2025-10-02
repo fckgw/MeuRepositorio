@@ -5,6 +5,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
 .header { display: flex; justify-content: space-between; align-items: center; background-color: #fff; padding: 1rem 1.5rem; border-bottom: 1px solid #dadce0; font-size: 1.2rem; }
 .user-menu { font-size: 0.9rem; display: flex; gap: 1rem; align-items: center; }
 .user-menu a { color: #1a73e8; text-decoration: none; font-weight: bold; }
+.header-logo { height: 35px; width: auto; }
 .toolbar { background-color: #f1f3f4; padding: 1rem 1.5rem; display: flex; align-items: center; gap: 1rem; }
 .toolbar button { background-color: #1a73e8; color: white; border: none; border-radius: 4px; padding: 10px 15px; font-weight: bold; cursor: pointer; transition: background-color 0.2s; }
 .toolbar button:hover { background-color: #185abc; }
@@ -41,11 +42,11 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
 .file-thumbnail { width: 100%; height: 100%; object-fit: cover; }
 .icon-default { background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%235f6368"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zM6 20V4h7v5h5v11H6z"/></svg>'); }
 .icon-audio { background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23f4b400"><path d="M12 3v9.28c-.47-.17-.97-.28-1.5-.28C8.01 12 6 14.01 6 16.5S8.01 21 10.5 21c2.31 0 4.2-1.75 4.45-4H15V6h4V3h-7z"/></svg>'); }
+.icon-video { background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%234285f4"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/></svg>'); }
 .icon-archive { background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%2334a853"><path d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-5 3h-2v2h2v2h-2v2h-2v-2H9v-2h2V9h2v2z"/></svg>'); }
+.icon-folder { background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%235f6368"><path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/></svg>'); }
 .icon-word { background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%232b579a"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zM13 18H9v-2h4v2zm3-4H9v-2h7v2zm-2.5-4H9V8h4.5v2z"/></svg>'); }
 .icon-pdf { background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23db4437"><path d="M20 2H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM9.5 11.5c0 .83-.67 1.5-1.5 1.5H7v2H5.5v-5H8c.83 0 1.5.67 1.5 1.5v.5zm-2.5.5h1v-1h-1v1zm4.5 2H10v-5h1.5v1.5h1V10h-1V8.5h1.5v5zm4.5-2.5c0 .83-.67 1.5-1.5 1.5s-1.5-.67-1.5-1.5v-1c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5v1z"/></svg>'); }
-.icon-folder { background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%235f6368"><path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/></svg>'); }
-.icon-video { background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%234285f4"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/></svg>'); }
 /* --- Ações do Arquivo --- */
 .file-actions { position: absolute; top: 5px; right: 5px; z-index: 2; }
 .action-btn { background-color: rgba(60, 64, 67, 0.7); color: white; border: none; border-radius: 50%; width: 28px; height: 28px; cursor: pointer; font-size: 16px; line-height: 28px; text-align: center; text-decoration: none; opacity: 0.8; transition: opacity 0.2s; }
@@ -71,7 +72,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
 /* --- Páginas de Autenticação e Admin --- */
 .auth-page { display: flex; justify-content: center; align-items: center; min-height: 100vh; background-color: #f1f3f4; }
 .auth-container { width: 100%; max-width: 400px; padding: 2rem; background: #fff; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); text-align: center; box-sizing: border-box; margin: 1rem; }
-.auth-container h1 { color: #1a73e8; margin-top: 0; }
+.auth-logo { max-width: 250px; height: auto; margin-bottom: 1.5rem; }
 .auth-container h2 { margin-bottom: 1.5rem; color: #5f6368; }
 .auth-container form { display: flex; flex-direction: column; gap: 1rem; }
 .auth-container input { padding: 12px; border: 1px solid #ccc; border-radius: 4px; width: 100%; box-sizing: border-box; font-size: 1rem; }

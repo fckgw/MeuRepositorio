@@ -2,7 +2,6 @@
 require_once 'session_check.php';
 if ($user['role'] !== 'admin') { die("Acesso negado."); }
 require_once 'db.php';
-
 $users_result = $conn->query("SELECT u.id, u.username, u.email, u.role, u.trial_ends_at, u.created_at, u.plan_id, u.status, p.plan_name FROM users u LEFT JOIN storage_plans p ON u.plan_id = p.id ORDER BY u.created_at DESC");
 $plans_result = $conn->query("SELECT id, plan_name, space_gb FROM storage_plans ORDER BY id");
 $plans = $plans_result->fetch_all(MYSQLI_ASSOC);
@@ -10,13 +9,15 @@ $plans = $plans_result->fetch_all(MYSQLI_ASSOC);
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Painel de Admin - <?php echo APP_NAME; ?></title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container">
         <header class="header">
-            <strong>Painel de Admin</strong>
+            <img src="<?php echo BASE_URL; ?>/images/logo-oficial.png" alt="<?php echo APP_NAME; ?> Logo" class="header-logo">
             <div class="user-menu">
                 <a href="index.php">Voltar ao Driver</a>
                 <a href="logout.php">Sair</a>
@@ -58,7 +59,7 @@ $plans = $plans_result->fetch_all(MYSQLI_ASSOC);
                                         </option>
                                     <?php endforeach; ?>
                                 </select>
-                                <button type="submit" class="btn btn-update">✓</button>
+                                <button type="submit" class="btn btn-update" title="Atualizar Plano">✓</button>
                             </form>
                         </td>
                         <td>
@@ -68,7 +69,7 @@ $plans = $plans_result->fetch_all(MYSQLI_ASSOC);
                                     <option value="active" <?php if ($row['status'] == 'active') echo 'selected'; ?>>Ativo</option>
                                     <option value="blocked" <?php if ($row['status'] == 'blocked') echo 'selected'; ?>>Bloqueado</option>
                                 </select>
-                                <button type="submit" class="btn btn-status">✓</button>
+                                <button type="submit" class="btn btn-status" title="Mudar Estado">✓</button>
                             </form>
                         </td>
                         <td>

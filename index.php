@@ -28,7 +28,7 @@ $percentage_used = !$is_unlimited && $total_space_bytes > 0 ? round(($used_space
 <body>
     <div class="container">
         <header class="header">
-            <strong><?php echo APP_NAME; ?></strong>
+            <img src="<?php echo BASE_URL; ?>/images/logo-oficial.png" alt="<?php echo APP_NAME; ?> Logo" class="header-logo">
             <div class="user-menu">
                 <span>Olá, <?php echo htmlspecialchars($user['username']); ?>!</span>
                 <?php if ($user['role'] == 'admin'): ?> <a href="admin.php">Painel Admin</a> <?php endif; ?>
@@ -87,13 +87,9 @@ $percentage_used = !$is_unlimited && $total_space_bytes > 0 ? round(($used_space
                     echo "<div class='file-item-wrapper' draggable='true' data-filename='$nome_arquivo'>";
                     echo "  <$tag $href class='file-item' data-is-image='" . ($is_image ? '1' : '0') . "' data-is-video='" . ($is_video ? '1' : '0') . "' data-is-word='" . ($is_word ? '1' : '0') . "' data-is-pdf='" . ($is_pdf ? '1' : '0') . "' data-is-dir='" . ($is_dir ? '1' : '0') . "'>";
                     $file_url = BASE_URL . '/' . $user_root_public_path . '/' . ($current_path ? $current_path . '/' : '') . $nome_arquivo;
-                    if ($is_image) {
-                        echo "  <div class='thumbnail-container'><img src='" . htmlspecialchars($file_url) . "' class='file-thumbnail' alt='Thumbnail' loading='lazy'></div>";
-                    } elseif ($is_video) {
-                        echo "  <div class='thumbnail-container'><video class='file-thumbnail' preload='metadata'><source src='" . htmlspecialchars($file_url) . "#t=0.5' type='video/mp4'></video></div>";
-                    } else {
-                        echo "  <div class='file-icon'></div>";
-                    }
+                    if ($is_image) { echo "  <div class='thumbnail-container'><img src='" . htmlspecialchars($file_url) . "' class='file-thumbnail' alt='Thumbnail' loading='lazy'></div>"; }
+                    elseif ($is_video) { echo "  <div class='thumbnail-container'><video class='file-thumbnail' preload='metadata'><source src='" . htmlspecialchars($file_url) . "#t=0.5' type='video/mp4'></video></div>"; }
+                    else { echo "  <div class='file-icon'></div>"; }
                     echo "      <div class='file-info'><span class='file-name'>$nome_arquivo</span><span class='file-date'>$data_hora</span></div>";
                     echo "      <div class='file-actions'>";
                     if (!$is_dir) echo "      <a href='" . BASE_URL . "/download.php?path=" . urlencode($current_path) . "&file=$nome_arquivo' class='action-btn download' title='Baixar'>&#x21E9;</a>";

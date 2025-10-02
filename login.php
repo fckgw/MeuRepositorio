@@ -46,7 +46,7 @@ $conn->close();
 </head>
 <body class="auth-page">
     <div class="auth-container">
-        <h1><?php echo APP_NAME; ?></h1>
+        <img src="<?php echo BASE_URL; ?>/images/logo-oficial.png" alt="<?php echo APP_NAME; ?> Logo" class="auth-logo">
         <h2>Login</h2>
         
         <?php if ($error): ?><div class="alert error"><?php echo $error; ?></div><?php endif; ?>
