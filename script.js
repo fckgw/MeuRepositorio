@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const isWord = fileItem.dataset.isWord === '1';
         const isPdf = fileItem.dataset.isPdf === '1';
 
-        // Lógica de ícones (ignora se houver thumbnail)
+        // Lógica de ícones (só é executada se o PHP não renderizou uma thumbnail)
         const iconElement = fileItem.querySelector('.file-icon');
         if (iconElement) {
             let iconClass = 'icon-default';
@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Adiciona evento de clique para abrir o preview (apenas para imagens e vídeos)
         if (isImage || isVideo) {
             fileItem.addEventListener('click', (e) => {
-                if(e.target.closest('.action-btn')) return;
+                if (e.target.closest('.action-btn')) return;
                 const modal = document.getElementById('preview-modal');
                 const contentContainer = document.getElementById('modal-preview-content');
                 contentContainer.innerHTML = '';
@@ -52,7 +52,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // --- FUNCIONALIDADE DE UPLOAD (SEM ALTERAÇÕES) ---
+    // --- FUNCIONALIDADE DE UPLOAD COM BARRA DE PROGRESSO E VALIDAÇÃO ---
     const uploadBtn = document.getElementById('upload-btn');
     const fileInput = document.getElementById('file-input');
     const uploadForm = document.getElementById('upload-form');
@@ -92,15 +92,18 @@ document.addEventListener('DOMContentLoaded', () => {
         xhr.send(formData);
     }
     
-    // --- OUTRAS FUNCIONALIDADES (CRIAR PASTA, DELETAR, MOVER, DRAG/DROP) ---
+    // --- FUNCIONALIDADES DOS BOTÕES (CRIAR PASTA, DELETAR) ---
     const newFolderBtn = document.getElementById('new-folder-btn');
     const newFolderForm = document.getElementById('new-folder-form');
     const folderNameInput = document.getElementById('folder_name_input');
     if (newFolderBtn) { newFolderBtn.addEventListener('click', () => { const folderName = prompt('Digite o nome da nova pasta:'); if (folderName && folderName.trim() !== '') { folderNameInput.value = folderName; newFolderForm.submit(); } }); }
+    
     const deleteBtns = document.querySelectorAll('.delete');
     const deleteItemForm = document.getElementById('delete-item-form');
     const itemNameInput = document.getElementById('item_name_input');
     deleteBtns.forEach(btn => { btn.addEventListener('click', e => { e.stopPropagation(); e.preventDefault(); const itemName = btn.dataset.name; if (confirm(`Tem certeza que deseja remover "${itemName}"? Esta ação não pode ser desfeita.`)) { itemNameInput.value = itemName; deleteItemForm.submit(); } }); });
+    
+    // --- FUNCIONALIDADE "MOVER PARA..." ---
     const moveModal = document.getElementById('move-item-modal');
     const confirmMoveBtn = document.getElementById('confirm-move-btn');
     let itemToMove = null;
@@ -121,6 +124,7 @@ document.addEventListener('DOMContentLoaded', () => {
             moveModal.style.display = 'block';
         });
     });
+
     if (confirmMoveBtn) {
         confirmMoveBtn.addEventListener('click', () => {
             const folderSelect = document.getElementById('folder-destination-select');
@@ -137,6 +141,8 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+    
+    // --- CONTROLE GERAL DOS MODAIS (FECHAR) ---
     const allModals = document.querySelectorAll('.modal');
     allModals.forEach(modal => {
         const closeModalBtn = modal.querySelector('.close-modal');
@@ -145,6 +151,7 @@ document.addEventListener('DOMContentLoaded', () => {
         modal.addEventListener('click', e => { if (e.target === modal) closeAndStopMedia(); });
     });
 
+    // --- FUNCIONALIDADE DRAG AND DROP ---
     const droppableFolders = document.querySelectorAll('.file-item[data-is-dir="1"]');
     fileItemWrappers.forEach(draggable => {
         draggable.addEventListener('dragstart', () => draggable.classList.add('dragging'));
@@ -166,22 +173,18 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     });
-});
-
-
-// --- LÓGICA DO MENU LATERAL RETRÁTIL ---
-const sidebar = document.querySelector('.sidebar');
-const toggleButton = document.getElementById('sidebar-toggle');
-if (sidebar && toggleButton) {
-    toggleButton.addEventListener('click', () => {
-        sidebar.classList.toggle('collapsed');
-        // Salva o estado no navegador do utilizador
-        localStorage.setItem('sidebarState', sidebar.classList.contains('collapsed') ? 'collapsed' : 'expanded');
-    });
-
-    // Verifica se há um estado guardado
-    const savedState = localStorage.getItem('sidebarState');
-    if (savedState === 'collapsed') {
-        sidebar.classList.add('collapsed');
+    
+    // --- LÓGICA DO MENU LATERAL RETRÁTIL ---
+    const sidebar = document.querySelector('.sidebar');
+    const toggleButton = document.getElementById('sidebar-toggle');
+    if (sidebar && toggleButton) {
+        toggleButton.addEventListener('click', () => {
+            sidebar.classList.toggle('collapsed');
+            localStorage.setItem('sidebarState', sidebar.classList.contains('collapsed') ? 'collapsed' : 'expanded');
+        });
+        const savedState = localStorage.getItem('sidebarState');
+        if (savedState === 'collapsed') {
+            sidebar.classList.add('collapsed');
+        }
     }
-}
+});

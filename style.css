@@ -7,35 +7,20 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
 .page-content { flex-grow: 1; width: calc(100% - 250px); }
 
 /* --- Menu Lateral (Sidebar) --- */
-.sidebar {
-    width: 250px;
-    background-color: #fff;
-    border-right: 1px solid #dadce0;
-    display: flex;
-    flex-direction: column; /* Essencial para o flex-grow funcionar */
-    height: 100vh;
-    position: sticky;
-    top: 0;
-    transition: width 0.3s ease;
-}
+.sidebar { width: 250px; background-color: #fff; border-right: 1px solid #dadce0; display: flex; flex-direction: column; height: 100vh; position: sticky; top: 0; transition: width 0.3s ease; }
 .sidebar-header { padding: 1rem; border-bottom: 1px solid #dadce0; position: relative; }
 .sidebar-logo { height: 40px; width: auto; display: block; margin: 0 auto; transition: opacity 0.3s ease; }
-.sidebar-nav {
-    flex-grow: 1; /* CORREÇÃO: Faz esta área ocupar todo o espaço disponível */
-    padding: 1rem 0;
-    overflow-y: auto; /* Adiciona scroll se houver muitos módulos */
-}
+.sidebar-nav { flex-grow: 1; padding: 1rem 0; overflow-y: auto; }
 .sidebar-nav ul { list-style: none; padding: 0; margin: 0; }
 .sidebar-nav .nav-link { display: flex; align-items: center; gap: 1rem; padding: 0.75rem 1.5rem; color: #3c4043; text-decoration: none; font-weight: 500; border-left: 3px solid transparent; white-space: nowrap; }
 .sidebar-nav .nav-link svg { width: 20px; height: 20px; color: #5f6368; flex-shrink: 0; }
 .sidebar-nav .nav-link:hover { background-color: #f1f3f4; }
 .sidebar-nav .nav-link.active { background-color: #e8f0fe; color: #1967d2; border-left-color: #1967d2; }
 .sidebar-nav .nav-link.active svg { color: #1967d2; }
-.sidebar-footer {
-    border-top: 1px solid #dadce0;
-    flex-shrink: 0; /* CORREÇÃO: Impede que o rodapé encolha */
-    overflow: hidden;
-}
+.sidebar-footer { border-top: 1px solid #dadce0; flex-shrink: 0; overflow: hidden; }
+.sidebar-footer .user-info { padding: 1rem 1.5rem; font-size: 0.8em; border-bottom: 1px solid #dadce0; }
+.user-info .info-label { color: #5f6368; }
+.user-info .info-value { font-weight: 500; }
 
 /* --- ESTILOS PARA O MENU RETRÁTIL --- */
 #sidebar-toggle { position: absolute; top: 15px; right: -15px; background-color: #fff; border: 1px solid #dadce0; border-radius: 50%; width: 30px; height: 30px; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 10; transition: transform 0.3s ease; }
@@ -43,9 +28,6 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
 .sidebar.collapsed .sidebar-logo, .sidebar.collapsed .nav-link span, .sidebar.collapsed .storage-text, .sidebar.collapsed .user-info { opacity: 0; visibility: hidden; transition: opacity 0.1s, visibility 0.1s; }
 .sidebar.collapsed .nav-link { justify-content: center; }
 .sidebar.collapsed #sidebar-toggle { transform: rotate(180deg); }
-.sidebar-footer .user-info { padding: 1rem 1.5rem; font-size: 0.8em; border-bottom: 1px solid #dadce0; }
-.user-info .info-label { color: #5f6368; }
-.user-info .info-value { font-weight: 500; }
 
 /* --- Cabeçalho e Barra de Ferramentas --- */
 .header { display: flex; justify-content: space-between; align-items: center; background-color: #fff; padding: 1rem 1.5rem; border-bottom: 1px solid #dadce0; }
@@ -84,13 +66,13 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
 .file-icon { width: 80px; height: 80px; background-size: contain; background-repeat: no-repeat; background-position: center; flex-shrink: 0; }
 .thumbnail-container { width: 120px; height: 80px; display: flex; align-items: center; justify-content: center; overflow: hidden; border-radius: 4px; background-color: #f1f3f4; flex-shrink: 0; }
 .file-thumbnail { width: 100%; height: 100%; object-fit: cover; }
-.icon-default { background-image: url('data:image/svg+xml,...'); }
-.icon-audio { background-image: url('data:image/svg+xml,...'); }
-.icon-video { background-image: url('data:image/svg+xml,...'); }
-.icon-archive { background-image: url('data:image/svg+xml,...'); }
-.icon-folder { background-image: url('data:image/svg+xml,...'); }
-.icon-word { background-image: url('data:image/svg+xml,...'); }
-.icon-pdf { background-image: url('data:image/svg+xml,...'); }
+.icon-default { background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%235f6368"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zM6 20V4h7v5h5v11H6z"/></svg>'); }
+.icon-audio { background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23f4b400"><path d="M12 3v9.28c-.47-.17-.97-.28-1.5-.28C8.01 12 6 14.01 6 16.5S8.01 21 10.5 21c2.31 0 4.2-1.75 4.45-4H15V6h4V3h-7z"/></svg>'); }
+.icon-video { background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%234285f4"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/></svg>'); }
+.icon-archive { background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%2334a853"><path d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-5 3h-2v2h2v2h-2v2h-2v-2H9v-2h2V9h2v2z"/></svg>'); }
+.icon-folder { background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%235f6368"><path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/></svg>'); }
+.icon-word { background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%232b579a"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zM13 18H9v-2h4v2zm3-4H9v-2h7v2zm-2.5-4H9V8h4.5v2z"/></svg>'); }
+.icon-pdf { background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23db4437"><path d="M20 2H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM9.5 11.5c0 .83-.67 1.5-1.5 1.5H7v2H5.5v-5H8c.83 0 1.5.67 1.5 1.5v.5zm-2.5.5h1v-1h-1v1zm4.5 2H10v-5h1.5v1.5h1V10h-1V8.5h1.5v5zm4.5-2.5c0 .83-.67 1.5-1.5 1.5s-1.5-.67-1.5-1.5v-1c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5v1z"/></svg>'); }
 .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.85); }
 #modal-preview-content { margin: auto; display: block; max-width: 90%; max-height: 90%; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
 #modal-preview-content > * { max-width: 100%; max-height: 100%; display: block; }
@@ -136,6 +118,24 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
 .admin-table .btn-status { background-color: #f4b400; }
 .admin-table .btn-resend { background-color: #34a853; }
 .admin-table .btn-manage-modules { background-color: #5f6368; }
+.admin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
+.admin-header h2 { margin: 0; }
+.btn-submit { background-color: #34a853; color: white; padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; width: 100%; font-size: 0.9em; }
+.admin-form-stacked .form-group { display: flex; flex-direction: column; gap: 5px; text-align: left; margin-bottom: 1rem; }
+.admin-form-stacked label { font-weight: bold; margin-bottom: 5px; font-size: 0.9em; color: #3c4043; }
+.admin-form-stacked input, .admin-form-stacked textarea { padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 1rem; transition: border-color 0.2s, box-shadow 0.2s; }
+.admin-form-stacked input:focus, .admin-form-stacked textarea:focus { border-color: #1a73e8; box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.2); outline: none; }
+.admin-form-stacked textarea { min-height: 80px; font-family: monospace; }
+.module-management-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem; }
+.module-manage-card { background-color: #fff; border-radius: 8px; padding: 1rem; box-shadow: 0 2px 4px rgba(0,0,0,0.05); display: flex; align-items: center; gap: 1rem; border: 1px solid #ddd; }
+.module-icon-preview.small { width: 40px; height: 40px; flex-shrink: 0; display: grid; place-items: center; background-color: #f1f3f4; border-radius: 4px; color: #5f6368; }
+.module-icon-preview.small svg { width: 24px; height: 24px; }
+.module-manage-info { display: flex; flex-direction: column; flex-grow: 1; }
+.module-manage-info code { background-color: #f1f3f4; padding: 2px 5px; border-radius: 4px; font-size: 0.8em; color: #5f6368; }
+.module-manage-actions { display: flex; gap: 10px; }
+.admin-table .btn-view, .module-manage-actions .btn-view { background-color: #34a853; }
+.admin-table .btn-edit, .module-manage-actions .btn-edit { background-color: #f4b400; }
+.admin-table .btn-delete, .module-manage-actions .btn-delete { background-color: #ea4335; }
 .modules-checkbox-list { max-height: 250px; overflow-y: auto; border: 1px solid #ccc; border-radius: 4px; padding: 10px; margin: 1rem 0; }
 .modules-checkbox-list label { display: block; padding: 8px; cursor: pointer; }
 .modules-checkbox-list label:hover { background-color: #f1f3f4; }
@@ -149,7 +149,6 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
 .module-tags { display: flex; flex-wrap: wrap; gap: 5px; }
 .module-tag { background-color: #e8f0fe; color: #1967d2; padding: 3px 8px; border-radius: 12px; font-size: 0.8em; font-weight: 500; }
 .no-modules { color: #999; font-style: italic; }
-.btn-submit { background-color: #34a853; color: white; padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; width: 100%; }
 .module-selector-page .header { position: sticky; top: 0; z-index: 10; }
 .module-selector-container { text-align: center; padding: 2rem; }
 .module-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1.5rem; max-width: 900px; margin: 2rem auto 0; }
@@ -172,68 +171,4 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
 @media (min-width: 769px) {
     .file-item .file-actions { display: none; }
     .file-item:hover .file-actions { display: flex; }
-}
-
-/* --- NOVOS ESTILOS PARA GESTÃO DE MÓDULOS --- */
-.module-management-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 1.5rem;
-}
-.module-manage-card {
-    background-color: #fff;
-    border-radius: 8px;
-    padding: 1rem;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-}
-.module-manage-info {
-    display: flex;
-    flex-direction: column;
-}
-.module-manage-info code {
-    background-color: #f1f3f4;
-    padding: 2px 5px;
-    border-radius: 4px;
-    font-size: 0.8em;
-}
-
-
-/* Adicione ao final do seu style.css */
-.admin-table .btn-edit { background-color: #5f6368; }
-.admin-table .btn-delete { background-color: #ea4335; }
-.admin-form-stacked label {
-    font-weight: bold;
-    margin-bottom: -10px;
-    font-size: 0.9em;
-    color: #3c4043;
-}
-
-
-
-/* --- REPAGINAÇÃO FINAL DO ADMIN --- */
-.admin-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1.5rem;
-}
-.admin-header h2 {
-    margin: 0;
-}
-.admin-form-stacked .form-group {
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-    text-align: left;
-}
-.admin-table .btn-view {
-    background-color: #34a853; /* Verde */
-}
-.admin-table .actions-cell {
-    display: flex;
-    gap: 10px;
-    justify-content: center;
 }

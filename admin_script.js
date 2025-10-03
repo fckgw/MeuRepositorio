@@ -1,9 +1,8 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // --- LÓGICA DO GRÁFICO ---
     const chartElement = document.getElementById('usersPerModuleChart');
     if(chartElement) {
-        fetch('get_stats.php')
-        .then(response => response.json())
-        .then(result => {
+        fetch('get_stats.php').then(response => response.json()).then(result => {
             if(result.status === 'success') {
                 const ctx = chartElement.getContext('2d');
                 new Chart(ctx, { type: 'doughnut', data: { labels: result.data.labels, datasets: [{ label: 'Utilizadores', data: result.data.values, backgroundColor: ['#4285F4', '#EA4335', '#FBBC05', '#34A853', '#A85334', '#FF6384', '#36A2EB'], hoverOffset: 4 }] }, options: { responsive: true, maintainAspectRatio: false } });
@@ -11,6 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // --- LÓGICA DO MODAL "GERIR MÓDULOS DO UTILIZADOR" ---
     const manageModulesModal = document.getElementById('manage-modules-modal');
     if(manageModulesModal) {
         document.querySelectorAll('.btn-manage-modules').forEach(button => {
@@ -39,42 +39,44 @@ document.addEventListener('DOMContentLoaded', () => {
         window.addEventListener('click', (e) => { if (e.target == manageModulesModal) manageModulesModal.style.display = 'none'; });
     }
 
-    const editModal = document.getElementById('edit-module-modal');
-    if (editModal) {
-        const editModuleId = document.getElementById('edit-module-id');
-        const editModuleName = document.getElementById('edit-module-name');
-        const editModulePath = document.getElementById('edit-module-path');
-        const editModuleSvg = document.getElementById('edit-module-svg');
+    // --- LÓGICA DO MODAL "CRIAR/EDITAR MÓDULO" ---
+    const moduleModal = document.getElementById('module-modal');
+    if (moduleModal) {
+        const modalTitle = document.getElementById('modal-title');
+        const moduleForm = document.getElementById('module-form');
+        const moduleIdInput = document.getElementById('edit-module-id');
+        const moduleNameInput = document.getElementById('edit-module-name');
+        const modulePathInput = document.getElementById('edit-module-path');
+        const moduleSvgInput = document.getElementById('edit-module-svg');
+        const showCreateBtn = document.getElementById('btn-show-create-modal');
+        const closeModalBtn = moduleModal.querySelector('.close-modal');
+
+        showCreateBtn.addEventListener('click', () => {
+            modalTitle.textContent = 'Criar Novo Módulo';
+            moduleForm.action = 'create_module.php';
+            moduleForm.reset();
+            moduleIdInput.value = '';
+            moduleModal.style.display = 'block';
+        });
+
         document.querySelectorAll('.btn-edit-module').forEach(button => {
             button.addEventListener('click', () => {
                 const moduleId = button.dataset.moduleid;
                 fetch(`get_module_details.php?module_id=${moduleId}`).then(res => res.json()).then(result => {
                     if (result.status === 'success') {
-                        editModuleId.value = result.data.id;
-                        editModuleName.value = result.data.module_name;
-                        editModulePath.value = result.data.module_path;
-                        editModuleSvg.value = result.data.icon_svg;
-                        editModal.style.display = 'block';
+                        modalTitle.textContent = 'Editar Módulo';
+                        moduleForm.action = 'edit_module.php';
+                        moduleIdInput.value = result.data.id;
+                        moduleNameInput.value = result.data.module_name;
+                        modulePathInput.value = result.data.module_path;
+                        moduleSvgInput.value = result.data.icon_svg;
+                        moduleModal.style.display = 'block';
                     } else { alert(result.message); }
                 });
             });
         });
-        const closeEditModal = editModal.querySelector('.close-modal');
-        if(closeEditModal) closeEditModal.addEventListener('click', () => editModal.style.display = 'none');
-        window.addEventListener('click', (e) => { if (e.target == editModal) editModal.style.display = 'none'; });
-    }
-    
-    const createCard = document.getElementById('create-module-card');
-    const showCreateFormBtn = document.getElementById('btn-show-create-form');
-    if(createCard && showCreateFormBtn) {
-        showCreateFormBtn.addEventListener('click', () => {
-            if (createCard.style.display === 'none' || createCard.style.display === '') {
-                createCard.style.display = 'block';
-                showCreateFormBtn.textContent = 'Cancelar';
-            } else {
-                createCard.style.display = 'none';
-                showCreateFormBtn.textContent = 'Criar Novo Módulo';
-            }
-        });
+        
+        if (closeModalBtn) closeModalBtn.addEventListener('click', () => moduleModal.style.display = 'none');
+        window.addEventListener('click', (e) => { if (e.target == moduleModal) moduleModal.style.display = 'none'; });
     }
 });
